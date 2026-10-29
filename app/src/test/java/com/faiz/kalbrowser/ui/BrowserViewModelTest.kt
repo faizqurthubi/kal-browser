@@ -67,6 +67,82 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun `ukuran awal 1280 kali 720`() {
+        val state = BrowserViewModel().uiState.value
+
+        assertThat(state.viewportWidth).isEqualTo(1280)
+        assertThat(state.viewportHeight).isEqualTo(720)
+        assertThat(state.effectiveSizeLabel).isEqualTo("1280 × 720")
+    }
+
+    @Test
+    fun `memilih preset mengubah lebar dan meminta pasang viewport`() = runTest {
+        val viewModel = BrowserViewModel()
+
+        viewModel.selectPreset(4)
+
+        assertThat(viewModel.uiState.value.viewportWidth).isEqualTo(1920)
+        assertThat(viewModel.commands.first()).isEqualTo(BrowserCommand.ApplyViewport(1920))
+    }
+
+    @Test
+    fun `preset yang sama tidak memicu perintah lagi`() = runTest {
+        val viewModel = BrowserViewModel()
+        viewModel.selectPreset(2)
+        assertThat(viewModel.commands.first()).isEqualTo(BrowserCommand.ApplyViewport(1366))
+
+        viewModel.selectPreset(2)
+
+        // Tidak ada perintah kedua yang menunggu, jadi uji ini hanya memastikan
+        // state tetap dan tidak ada muat ulang tambahan yang dikirim.
+        assertThat(viewModel.uiState.value.viewportWidth).isEqualTo(1366)
+    }
+
+    @Test
+    fun `indeks preset di luar rentang diabaikan`() {
+        val viewModel = BrowserViewModel()
+
+        viewModel.selectPreset(99)
+        viewModel.selectPreset(-1)
+
+        assertThat(viewModel.uiState.value.selectedPresetIndex)
+            .isEqualTo(BrowserUiState.DEFAULT_PRESET_INDEX)
+    }
+
+    @Test
+    fun `rotate menukar lebar dan tinggi`() = runTest {
+        val viewModel = BrowserViewModel()
+
+        viewModel.rotate()
+
+        val state = viewModel.uiState.value
+        assertThat(state.viewportWidth).isEqualTo(720)
+        assertThat(state.viewportHeight).isEqualTo(1280)
+        assertThat(state.effectiveSizeLabel).isEqualTo("720 × 1280")
+        assertThat(viewModel.commands.first()).isEqualTo(BrowserCommand.ApplyViewport(720))
+    }
+
+    @Test
+    fun `rotate dua kali kembali ke ukuran semula`() {
+        val viewModel = BrowserViewModel()
+
+        viewModel.rotate()
+        viewModel.rotate()
+
+        assertThat(viewModel.uiState.value.viewportWidth).isEqualTo(1280)
+    }
+
+    @Test
+    fun `preset dan orientasi digabung dengan benar`() {
+        val viewModel = BrowserViewModel()
+
+        viewModel.selectPreset(4)
+        viewModel.rotate()
+
+        assertThat(viewModel.uiState.value.effectiveSizeLabel).isEqualTo("1080 × 1920")
+    }
+
+    @Test
     fun `tombol muat ulang memuat ulang saat halaman diam`() = runTest {
         val viewModel = BrowserViewModel()
 

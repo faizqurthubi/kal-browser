@@ -12,12 +12,15 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.faiz.kalbrowser.PRESETS
 import com.faiz.kalbrowser.databinding.ActivityMainBinding
 import com.faiz.kalbrowser.desktop.DesktopMode
 import com.faiz.kalbrowser.ui.BrowserCommand
@@ -30,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: BrowserViewModel by viewModels()
     private lateinit var desktopMode: DesktopMode
+    private var updatingSpinnerFromState = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +53,8 @@ class MainActivity : AppCompatActivity() {
     private fun setupWebView() {
         // Semua penyetelan WebSettings dan penyamaran desktop ada di DesktopMode,
         // supaya Activity tinggal mengurus tampilan dan navigasi.
-        desktopMode = DesktopMode(binding.webView).also { it.apply() }
+        desktopMode = DesktopMode(binding.webView)
+        desktopMode.apply(viewModel.uiState.value.viewportWidth)
 
         binding.webView.webViewClient = object : WebViewClient() {
 
@@ -60,11 +65,13 @@ class MainActivity : AppCompatActivity() {
 
             override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
                 viewModel.onPageStarted(url.orEmpty())
+                desktopMode.injectViewportNow()
                 syncHistory()
             }
 
             override fun onPageFinished(view: WebView, url: String?) {
                 viewModel.onPageFinished(url.orEmpty())
+                desktopMode.injectViewportNow()
                 syncHistory()
             }
 
@@ -107,6 +114,28 @@ class MainActivity : AppCompatActivity() {
         binding.buttonForward.setOnClickListener { viewModel.goForward() }
         binding.buttonReload.setOnClickListener { viewModel.reloadOrStop() }
         binding.buttonOpen.setOnClickListener { submitAddress() }
+
+        val presets = ArrayAdapter(this, R.layout.item_screen_size, PRESETS.map { it.label })
+        presets.setDropDownViewResource(R.layout.item_screen_size)
+        binding.screenSizeSpinner.adapter = presets
+        binding.screenSizeSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long,
+                ) {
+                    // Perubahan dari render state bukan pilihan pengguna, dan
+                    // memprosesnya akan memicu muat ulang berulang.
+                    if (updatingSpinnerFromState) return
+                    viewModel.selectPreset(position)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+            }
+
+        binding.buttonRotate.setOnClickListener { viewModel.rotate() }
 
         binding.addressBar.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
@@ -168,6 +197,13 @@ class MainActivity : AppCompatActivity() {
             if (state.isLoading) R.string.action_stop else R.string.action_reload,
         )
 
+        if (binding.screenSizeSpinner.selectedItemPosition != state.selectedPresetIndex) {
+            updatingSpinnerFromState = true
+            binding.screenSizeSpinner.setSelection(state.selectedPresetIndex)
+            updatingSpinnerFromState = false
+        }
+        binding.screenSizeLabel.text = state.effectiveSizeLabel
+
         binding.pageProgress.progress = state.progress
         binding.pageProgress.visibility = if (state.isLoading) View.VISIBLE else View.GONE
 
@@ -190,6 +226,12 @@ class MainActivity : AppCompatActivity() {
                         BrowserCommand.GoForward -> binding.webView.goForward()
                         BrowserCommand.Reload -> binding.webView.reload()
                         BrowserCommand.Stop -> binding.webView.stopLoading()
+                        is BrowserCommand.ApplyViewport -> {
+                            desktopMode.setViewportWidth(command.width)
+                            // Memuat ulang hanya kalau memang ada halaman. WebView
+                            // kosong yang dimuat ulang hanya membuat layar berkedip.
+                            if (binding.webView.url != null) binding.webView.reload()
+                        }
                     }
                     syncHistory()
                 }

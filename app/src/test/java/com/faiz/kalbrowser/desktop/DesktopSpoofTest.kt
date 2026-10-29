@@ -41,8 +41,8 @@ class DesktopSpoofTest {
     }
 
     @Test
-    fun `script menimpa platform maxTouchPoints dan mobile`() {
-        val script = DesktopSpoof.documentStartScript(DesktopSpoof.desktopUserAgent(realUserAgent))
+    fun `script penyamaran menimpa platform maxTouchPoints dan mobile`() {
+        val script = DesktopSpoof.spoofScript(DesktopSpoof.desktopUserAgent(realUserAgent))
 
         assertThat(script).contains("'platform', 'Win32'")
         assertThat(script).contains("'maxTouchPoints', 0")
@@ -51,24 +51,54 @@ class DesktopSpoofTest {
     }
 
     @Test
-    fun `script memuat UA desktop sebagai string JavaScript`() {
+    fun `script penyamaran memuat UA desktop sebagai string JavaScript`() {
         val desktop = DesktopSpoof.desktopUserAgent(realUserAgent)
-        val script = DesktopSpoof.documentStartScript(desktop)
+        val script = DesktopSpoof.spoofScript(desktop)
 
         assertThat(script).contains("'$desktop'")
     }
 
     @Test
+    fun `script viewport memakai lebar yang diminta`() {
+        val script = DesktopSpoof.viewportScript(1280)
+
+        assertThat(script).contains("var W = 1280;")
+        assertThat(script).contains("'width=' + W + ', initial-scale=1'")
+    }
+
+    @Test
+    fun `lebar nol dijepit jadi satu supaya width tidak kosong`() {
+        assertThat(DesktopSpoof.viewportScript(0)).contains("var W = 1;")
+        assertThat(DesktopSpoof.viewportScript(-5)).contains("var W = 1;")
+    }
+
+    @Test
+    fun `script viewport mengamati perubahan dom`() {
+        val script = DesktopSpoof.viewportScript(1024)
+
+        assertThat(script).contains("new MutationObserver(schedule)")
+        assertThat(script).contains("attributeFilter: ['content']")
+    }
+
+    @Test
+    fun `script gabungan berisi penyamaran dan viewport`() {
+        val script = DesktopSpoof.startScript(DesktopSpoof.desktopUserAgent(realUserAgent), 1440)
+
+        assertThat(script).contains("'platform', 'Win32'")
+        assertThat(script).contains("var W = 1440;")
+    }
+
+    @Test
     fun `UA dengan tanda kutip tidak disusupkan ke script`() {
-        val script = DesktopSpoof.documentStartScript("Mozilla/5.0'); alert(1); //")
+        val script = DesktopSpoof.spoofScript("Mozilla/5.0'); alert(1); //")
 
         assertThat(script).doesNotContain("alert(1)")
         assertThat(script).contains("'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'")
     }
 
     @Test
-    fun `script dibungkus fungsi yang langsung jalan`() {
-        val script = DesktopSpoof.documentStartScript("Mozilla/5.0 (Windows NT 10.0)")
+    fun `script penyamaran dibungkus fungsi yang langsung jalan`() {
+        val script = DesktopSpoof.spoofScript("Mozilla/5.0 (Windows NT 10.0)")
 
         assertThat(script).startsWith("(function () {")
         assertThat(script).endsWith("})();")

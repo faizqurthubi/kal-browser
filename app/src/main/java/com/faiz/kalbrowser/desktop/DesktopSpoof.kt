@@ -40,7 +40,7 @@ object DesktopSpoof {
      * lebih dulu atau mematikan defineProperty, dan satu error di sini akan
      * mematikan sisa script.
      */
-    fun documentStartScript(desktopUserAgent: String): String {
+    fun spoofScript(desktopUserAgent: String): String {
         val userAgent = jsString(desktopUserAgent)
         return """
             (function () {
@@ -70,6 +70,57 @@ object DesktopSpoof {
             })();
         """.trimIndent()
     }
+
+    /**
+     * Memaksa meta viewport memakai lebar layar virtual, sehingga media query CSS
+     * dan satuan vh mengikuti ukuran palsu itu, bukan lebar layar ponsel.
+     *
+     * Pengamat DOM ikut dipasang karena banyak situs menulis ulang meta viewport
+     * setelah halaman dimuat. Tanpa pengamat, nilai yang sudah benar akan ditimpa
+     * kembali beberapa ratus milidetik kemudian.
+     */
+    fun viewportScript(width: Int): String {
+        val safeWidth = width.coerceAtLeast(1)
+        return """
+            (function () {
+              var W = $safeWidth;
+              function fix() {
+                try {
+                  var m = document.querySelector('meta[name=viewport]');
+                  if (!m) {
+                    m = document.createElement('meta');
+                    m.name = 'viewport';
+                    (document.head || document.documentElement).appendChild(m);
+                  }
+                  var c = 'width=' + W + ', initial-scale=1';
+                  if (m.content !== c) m.content = c;
+                } catch (e) {}
+              }
+              fix();
+
+              // Halaman yang terus berubah memicu pengamat ini terus-menerus.
+              // Pekerjaannya dijadwalkan sekali per putaran, bukan setiap mutasi.
+              var scheduled = false;
+              function schedule() {
+                if (scheduled) return;
+                scheduled = true;
+                setTimeout(function () { scheduled = false; fix(); }, 0);
+              }
+              try {
+                new MutationObserver(schedule).observe(document.documentElement, {
+                  childList: true,
+                  subtree: true,
+                  attributes: true,
+                  attributeFilter: ['content']
+                });
+              } catch (e) {}
+            })();
+        """.trimIndent()
+    }
+
+    /** Script lengkap untuk document-start: penyamaran perangkat lalu viewport. */
+    fun startScript(desktopUserAgent: String, viewportWidth: Int): String =
+        spoofScript(desktopUserAgent) + "\n" + viewportScript(viewportWidth)
 
     /**
      * UA asli tidak pernah memuat tanda kutip atau baris baru, jadi nilai seperti

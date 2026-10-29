@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dipakai untuk isi spinner sekaligus daftar dropdown-nya, supaya baris yang
+     dipilih dan baris di dalam daftar tidak berbeda ukuran atau warna. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/text1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/control_height"
+    android:paddingStart="@dimen/field_padding"
+    android:paddingEnd="@dimen/field_padding"
+    android:textColor="@color/ink"
+    android:textSize="14sp" />

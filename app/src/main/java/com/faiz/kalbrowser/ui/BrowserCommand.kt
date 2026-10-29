@@ -16,4 +16,11 @@ sealed interface BrowserCommand {
     data object Reload : BrowserCommand
 
     data object Stop : BrowserCommand
+
+    /**
+     * Memasang lebar virtual baru lalu memuat ulang. Muat ulang perlu karena meta
+     * viewport hanya dibaca saat dokumen disusun; mengubahnya pada dokumen yang
+     * sudah jadi tidak menghitung ulang tata letak.
+     */
+    data class ApplyViewport(val width: Int) : BrowserCommand
 }

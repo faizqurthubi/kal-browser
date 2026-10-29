@@ -85,6 +85,9 @@ Dua baris di atas, tidak ada apa pun di bawah. Susunan ini mengikuti panduan bag
 - Kolom URL menampilkan alamat apa adanya setelah dimuat, karena pengguna perlu membaca alamat yang sedang dipalsukan, bukan versi yang sudah dirapikan.
 - Tombol kembali dan maju nonaktif saat riwayat habis. Nonaktif berarti tidak bisa ditekan dan ikonnya ikut memudar, bukan hanya berubah warna.
 - Tombol muat ulang berubah menjadi tombol hentikan selama halaman dimuat. Satu tombol, dua keadaan, karena keduanya tidak pernah dibutuhkan bersamaan.
+- Dropdown berisi lima ukuran dari panduan. Baris yang dipilih dan baris di dalam daftar memakai
+  tata letak yang sama, supaya angka yang dibaca sebelum memilih sama persis dengan yang dibaca
+  setelahnya.
 - Label ukuran menunjukkan ukuran efektif setelah orientasi virtual diterapkan. Saat belum diputar angkanya sama dengan isi dropdown. Saat diputar, label menjadi satu-satunya tempat yang menunjukkan bahwa lebar dan tinggi sudah bertukar.
 - Tombol Buka memakai tinta biasa, bukan warna aksen. Menekan tombol itu tidak lebih penting daripada menekan tombol Go di papan ketik, jadi memberinya aksen akan memindahkan fokus dari halaman web.
 - Tidak ada bilah alamat bawah, tidak ada tombol berbagi, tidak ada bookmark, tidak ada tab, tidak ada menu tiga titik. Yang tidak ada di panduan tidak dibuat.

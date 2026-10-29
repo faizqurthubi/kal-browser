@@ -16,13 +16,13 @@ Aplikasi masih dibangun bertahap. Yang sudah ada di repo ini:
 | Bilah progres dan keadaan kosong | Selesai |
 | Build dan rilis lewat GitHub Actions | Selesai |
 | Mode desktop: User-Agent, Client Hints, platform, maxTouchPoints | Selesai |
-| Meta viewport `width=W` | Belum |
-| Ukuran layar virtual dan tombol tukar | Belum |
+| Ukuran layar virtual dan meta viewport `width=W` | Selesai |
+| Tombol tukar lebar dan tinggi | Selesai |
 | Letterbox | Belum |
 | Fullscreen video, unduh berkas, unggah berkas | Belum |
 | Simpan pengaturan terakhir | Belum |
 
-Artinya APK di Release sekarang sudah melaporkan diri sebagai Chrome di Windows, tapi belum mengubah lebar tata letak halaman dan belum memasang letterbox. Riwayat pekerjaan per tahap ada di `PANDUAN_DesktopBrowser.md` bagian 10.
+Artinya APK di Release sekarang sudah melaporkan diri sebagai Chrome di Windows dan memaksa halaman memakai lebar layar virtual pilihanmu, tapi kotak halamannya belum dikunci ke rasio itu, jadi halaman masih diregangkan mengikuti layar ponsel. Letterbox ada di tahap berikutnya. Riwayat pekerjaan per tahap ada di `PANDUAN_DesktopBrowser.md` bagian 10.
 
 ## Unduh dan pasang
 
@@ -84,7 +84,8 @@ Workflow `Build APK` berjalan pada setiap push ke branch mana pun dan pada tombo
 
 - Mesin render memakai Android System WebView bawaan ponsel. Perbarui **Android System WebView** atau Chrome dari Play Store supaya situs modern tampil benar.
 - Sebagian situs tetap bisa mendeteksi bahwa halaman dibuka di WebView walaupun User-Agent sudah dipalsukan. Itu batas mesin render, bukan kesalahan aplikasi.
-- Aplikasi belum menyimpan alamat terakhir dan ukuran layar. Keduanya masuk tahap berikutnya.
+- Aplikasi belum menyimpan alamat terakhir dan ukuran layar, jadi pengaturan kembali ke 1280 × 720 setiap aplikasi dibuka. Penyimpanan masuk tahap berikutnya.
+- Kotak halaman belum memakai rasio layar virtual, sehingga halaman masih tampil memenuhi layar ponsel dan bukan sebagai kotak berletterbox.
 
 ## Isi repo
 

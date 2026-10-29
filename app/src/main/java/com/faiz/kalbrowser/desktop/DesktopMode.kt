@@ -11,7 +11,7 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 
 /**
- * Menerapkan penyamaran desktop ke satu WebView.
+ * Menerapkan penyamaran desktop dan lebar layar virtual ke satu WebView.
  *
  * Setiap fitur androidx.webkit diperiksa dulu. Di perangkat dengan WebView lama,
  * fiturnya tidak tersedia dan aplikasi harus tetap jalan dengan UA dasar saja,
@@ -25,11 +25,35 @@ class DesktopMode(private val webView: WebView) {
     var desktopUserAgent: String = ""
         private set
 
-    fun apply() {
+    private var viewportWidth: Int = 0
+
+    fun apply(initialViewportWidth: Int) {
+        viewportWidth = initialViewportWidth
         applySettings()
         applyUserAgent()
         applyClientHints()
-        applyDocumentStartScript()
+        registerStartScript()
+    }
+
+    /**
+     * Dipanggil saat ukuran atau orientasi virtual berubah. Script lama harus
+     * dilepas lebih dulu, karena setiap pendaftaran menambah script baru yang
+     * jalan di semua halaman berikutnya.
+     */
+    fun setViewportWidth(width: Int) {
+        if (width == viewportWidth) return
+        viewportWidth = width
+        registerStartScript()
+    }
+
+    /**
+     * Menyuntik viewport ke dokumen yang sedang terbuka. Document-start script
+     * sudah menangani halaman berikutnya; ini menutup kasus WebView yang terlalu
+     * lama untuk mendukung document-start.
+     */
+    fun injectViewportNow() {
+        if (viewportWidth <= 0) return
+        webView.evaluateJavascript(DesktopSpoof.viewportScript(viewportWidth), null)
     }
 
     // JavaScript wajib: tanpa itu meta viewport dan script penyamaran tidak
@@ -92,15 +116,14 @@ class DesktopMode(private val webView: WebView) {
             .setFullVersion(full)
             .build()
 
-    private fun applyDocumentStartScript() {
+    private fun registerStartScript() {
+        if (viewportWidth <= 0) return
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) return
 
-        // Daftar ulang harus menghapus handler lama, kalau tidak script yang
-        // sudah usang ikut jalan di setiap halaman berikutnya.
         scriptHandler?.remove()
         scriptHandler = WebViewCompat.addDocumentStartJavaScript(
             webView,
-            DesktopSpoof.documentStartScript(desktopUserAgent),
+            DesktopSpoof.startScript(desktopUserAgent, viewportWidth),
             setOf("*"),
         )
     }

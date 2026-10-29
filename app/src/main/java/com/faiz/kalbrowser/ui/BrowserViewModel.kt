@@ -1,6 +1,7 @@
 package com.faiz.kalbrowser.ui
 
 import androidx.lifecycle.ViewModel
+import com.faiz.kalbrowser.PRESETS
 import com.faiz.kalbrowser.domain.UrlNormalizer
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -46,6 +47,20 @@ class BrowserViewModel : ViewModel() {
     fun reloadOrStop() {
         val command = if (_uiState.value.isLoading) BrowserCommand.Stop else BrowserCommand.Reload
         _commands.trySend(command)
+    }
+
+    fun selectPreset(index: Int) {
+        if (index !in PRESETS.indices) return
+        if (index == _uiState.value.selectedPresetIndex) return
+
+        _uiState.update { it.copy(selectedPresetIndex = index) }
+        _commands.trySend(BrowserCommand.ApplyViewport(_uiState.value.viewportWidth))
+    }
+
+    /** Menukar lebar dan tinggi virtual tanpa memutar layar fisik. */
+    fun rotate() {
+        _uiState.update { it.copy(isPortrait = !it.isPortrait) }
+        _commands.trySend(BrowserCommand.ApplyViewport(_uiState.value.viewportWidth))
     }
 
     fun onPageStarted(url: String) {
