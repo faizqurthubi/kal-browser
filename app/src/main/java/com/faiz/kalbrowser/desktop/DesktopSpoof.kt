@@ -63,10 +63,30 @@ object DesktopSpoof {
                 }
               } catch (e) {}
 
-              // Touch event hanya ada di perangkat sentuh. Menghapus propertinya
-              // membuat 'ontouchstart' in window bernilai false, sama seperti desktop.
-              try { delete Window.prototype.ontouchstart; } catch (e) {}
-              try { delete Document.prototype.ontouchstart; } catch (e) {}
+              // Touch event hanya ada di perangkat sentuh. Propertinya harus
+              // dihapus dari window sendiri DAN dari prototipenya, karena di
+              // WebView Android properti ini menempel di objek window, sehingga
+              // menghapus yang di prototype tidak berpengaruh apa pun.
+              var namaSentuh = ['ontouchstart', 'ontouchmove', 'ontouchend', 'ontouchcancel'];
+              var sasaranSentuh = [window, Window.prototype, Document.prototype,
+                                   Element.prototype, HTMLElement.prototype];
+              for (var t = 0; t < sasaranSentuh.length; t++) {
+                for (var n = 0; n < namaSentuh.length; n++) {
+                  try { delete sasaranSentuh[t][namaSentuh[n]]; } catch (e) {}
+                }
+              }
+
+              // Sebagian properti tidak bisa dihapus. Yang masih tersisa ditutupi
+              // dengan nilai undefined, karena pemeriksaan yang paling banyak
+              // dipakai situs adalah typeof, bukan operator in.
+              if ('ontouchstart' in window) {
+                try {
+                  Object.defineProperty(window, 'ontouchstart', {
+                    get: function () { return undefined; },
+                    configurable: true
+                  });
+                } catch (e) {}
+              }
             })();
         """.trimIndent()
     }
@@ -211,6 +231,13 @@ object DesktopSpoof {
                 ? navigator.userAgentData.mobile
                 : 'tidak tersedia'),
               'ontouchstart: ' + ('ontouchstart' in window),
+              'typeof ontouchstart: ' + (typeof window.ontouchstart),
+              'ontouchstart milik window: ' + window.hasOwnProperty('ontouchstart'),
+              'ontouchstart bisa dihapus: ' + (function () {
+                var d = Object.getOwnPropertyDescriptor(window, 'ontouchstart')
+                  || Object.getOwnPropertyDescriptor(Window.prototype, 'ontouchstart');
+                return d ? d.configurable : 'tidak ditemukan';
+              })(),
               'user agent: ' + navigator.userAgent
             ];
             return baris.join('\n');

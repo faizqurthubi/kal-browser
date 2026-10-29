@@ -14,21 +14,21 @@ Tiga status dipakai, dan bedanya sengaja dijaga:
 | No | Butir | Status | Bukti |
 |---|---|---|---|
 | 1 | Workflow jalan pada tag `v*` dan melampirkan APK ke Release | LULUS | 10 tag rilis, semuanya sukses, unduhan publik tanpa login menjawab HTTP 200 |
-| 2 | Aplikasi terbuka, address bar memuat URL dan pencarian | LULUS untuk URL, BELUM DIUJI untuk pencarian | Beberapa situs dimuat pemilik. Pencarian lewat Google baru diuji sebagai aturan murni, belum diketuk di HP |
+| 2 | Aplikasi terbuka, address bar memuat URL dan pencarian | LULUS | Pemilik menguji pencarian tanpa titik dan hasilnya terbuka |
 | 3 | Situs dengan tata letak mobile dan desktop menampilkan desktop | LULUS untuk satu situs | `tbkholding.co.id/id` dipastikan pemilik berubah dari tata letak mobile ke desktop pada 1920 |
-| 4 | Situs pendeteksi melaporkan Windows dan Chrome, `userAgentData.mobile` false | BELUM DIUJI | `kal:info` sekarang menampilkan user agent, `mobile menurut hint`, dan `ontouchstart` supaya bisa dibuktikan tanpa situs lain |
-| 5 | Mengganti ukuran mengubah lebar CSS yang dilihat halaman | BELUM DIUJI setelah jalur transformasi | Terakhir terukur 1571 sebelum perbaikan. Setelah perbaikan, `lebar halaman` harus 1920 |
+| 4 | Situs pendeteksi melaporkan Windows dan Chrome, `userAgentData.mobile` false | SEBAGIAN | `mobile menurut hint` sudah `false` dan `platform` Win32, tapi `ontouchstart` masih `true` pada v1.9.0. Perbaikan sedang diuji pada v1.9.1 |
+| 5 | Mengganti ukuran mengubah lebar CSS yang dilihat halaman | LULUS | Pemilik memastikan `kal:info` pada 1920 × 1080 melaporkan lebar dan tinggi sesuai |
 | 6 | Tombol tukar menukar W dan H, rasio berubah, tanpa stretch, sisa hitam | LULUS | Pemilik memastikan `1080 × 1920` berhasil dan kotak tetap bertepi hitam |
-| 7 | `100vh` sesuai tinggi virtual | BELUM DIUJI | `kal:info` menampilkan `tinggi halaman`, jadi bisa dibaca langsung |
+| 7 | `100vh` sesuai tinggi virtual | LULUS | `tinggi halaman` pada `kal:info` sesuai tinggi virtual |
 | 8 | Sentuhan akurat pada semua ukuran | LULUS untuk 1920 | Pemilik menguji ketukan menu pada jalur transformasi dan hasilnya tepat |
 | 9 | Video HTML5 bisa diputar dan fullscreen berfungsi | LULUS | Dua tangkapan layar pemilik menunjukkan pemutar situs memenuhi layar penuh |
 | 10 | Unduh dan unggah berfungsi | LULUS | Pemilik menyatakan butir 2, 3, dan 4 berhasil |
-| 11 | Tombol kembali, maju, muat ulang, dan tombol kembali sistem | BELUM DIUJI untuk maju dan muat ulang | Tombol kembali sistem sudah dipakai pemilik. Maju dan muat ulang belum dicoba terpisah |
-| 12 | Memutar HP tidak merusak letterbox dan tidak mereset halaman | BELUM DIUJI | `configChanges` sudah dipasang, dan perhitungan letterbox dilewati saat video fullscreen |
+| 11 | Tombol kembali, maju, muat ulang, dan tombol kembali sistem | LULUS | Pemilik menguji mundur, maju, lalu muat ulang |
+| 12 | Memutar HP tidak merusak letterbox dan tidak mereset halaman | LULUS | Pemilik memutar HP saat halaman terbuka, kotak menyesuaikan dan halaman tidak termuat ulang |
 | 13 | Ukuran dan orientasi tersimpan setelah aplikasi ditutup | LULUS | Pemilik memastikan `1080 × 1920` bertahan setelah ditutup |
 | 14 | Tidak ada crash saat fitur WebView tidak didukung | LULUS | Setiap `WebViewFeature` diperiksa dulu sebelum dipakai, di dua tempat |
 
-Ringkasan: 8 lulus, 1 lulus sebagian, 5 belum diuji, 0 gagal.
+Ringkasan: 12 lulus, 1 sebagian, 1 belum diuji, 0 gagal.
 
 ## Delivery Gate
 
@@ -68,11 +68,7 @@ Dial dan penguncian konsistensi tidak punya objek di aplikasi ini. Yang bisa dip
 
 ## Yang dibutuhkan dari pemilik
 
-Lima butir yang belum diuji tidak bisa saya buktikan dari sini. Semuanya bisa diselesaikan dalam beberapa menit dengan `kal:info`:
+Dua butir masih terbuka:
 
-1. Buka situs apa pun pada `1920 × 1080`, tempel `kal:info`. Catat `lebar halaman` dan `tinggi halaman`. Menutup butir 5 dan 7.
-2. Buka `https://www.whatismybrowser.com`. Menutup butir 3 untuk situs kedua.
-3. Di halaman yang sama, tempel `kal:info`. Baris `mobile menurut hint` harus `false`, `ontouchstart` harus `false`. Menutup butir 4.
-4. Ketik kata tanpa titik, misalnya `jadwal sholat jakarta`, lalu Buka. Menutup butir 2.
-5. Tekan maju setelah mundur satu halaman, lalu tekan muat ulang. Menutup butir 11.
-6. Putar HP saat halaman terbuka, bukan saat video. Halaman tidak boleh termuat ulang dan kotak harus menyesuaikan. Menutup butir 12.
+1. Butir 3 untuk situs kedua: buka `https://www.whatismybrowser.com`, pastikan tata letaknya desktop, bukan tata letak ponsel.
+2. Butir 4: pada v1.9.0, `ontouchstart` masih `true`. Perbaikannya ada di v1.9.1, dan perlu dipastikan ulang lewat `kal:info`.

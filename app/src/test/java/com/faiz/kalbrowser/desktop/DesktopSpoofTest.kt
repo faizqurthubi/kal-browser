@@ -47,7 +47,11 @@ class DesktopSpoofTest {
         assertThat(script).contains("'platform', 'Win32'")
         assertThat(script).contains("'maxTouchPoints', 0")
         assertThat(script).contains("'mobile', false")
-        assertThat(script).contains("delete Window.prototype.ontouchstart")
+        // Sifatnya: properti sentuh dihapus dari window sendiri dan dari
+        // prototipenya, karena di WebView Android keduanya berbeda tempat.
+        assertThat(script).contains("delete sasaranSentuh[t][namaSentuh[n]]")
+        assertThat(script).contains("var sasaranSentuh = [window, Window.prototype")
+        assertThat(script).contains("HTMLElement.prototype")
     }
 
     @Test
@@ -118,6 +122,24 @@ class DesktopSpoofTest {
         assertThat(script).contains("lebar dokumen")
         assertThat(script).contains("geser horizontal")
         assertThat(script).contains("elemen terlebar")
+    }
+
+    @Test
+    fun `properti sentuh yang tidak bisa dihapus ditutupi nilai undefined`() {
+        val script = DesktopSpoof.spoofScript("Mozilla/5.0")
+
+        // Sebagian properti bawaan tidak bisa dihapus sama sekali. Menutupinya
+        // dengan undefined menyelamatkan pemeriksaan yang memakai typeof.
+        assertThat(script).contains("Object.defineProperty(window, 'ontouchstart'")
+        assertThat(script).contains("return undefined")
+    }
+
+    @Test
+    fun `script periksa dapat menjelaskan kenapa sentuhan masih terdeteksi`() {
+        val script = DesktopSpoof.diagnosticsScript()
+
+        assertThat(script).contains("ontouchstart milik window")
+        assertThat(script).contains("ontouchstart bisa dihapus")
     }
 
     @Test
