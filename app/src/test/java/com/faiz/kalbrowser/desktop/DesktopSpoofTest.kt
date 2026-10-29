@@ -121,6 +121,18 @@ class DesktopSpoofTest {
     }
 
     @Test
+    fun `script periksa menampilkan bukti penyamaran desktop`() {
+        // Checklist penerimaan meminta dua hal ini dibuktikan dari dalam aplikasi,
+        // tanpa perlu membuka situs pendeteksi.
+        val script = DesktopSpoof.diagnosticsScript()
+
+        assertThat(script).contains("mobile menurut hint")
+        assertThat(script).contains("userAgentData")
+        assertThat(script).contains("ontouchstart")
+        assertThat(script).contains("navigator.userAgent")
+    }
+
+    @Test
     fun `pencarian elemen terlebar dibatasi supaya halaman besar tidak membeku`() {
         val script = DesktopSpoof.diagnosticsScript()
 

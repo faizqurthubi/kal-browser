@@ -94,6 +94,9 @@ halaman. Yang perlu dibaca:
   layar, dan baris `elemen terlebar` menyebut elemen mana.
 - `geser horizontal` menunjukkan seberapa jauh halaman sudah digeser. Halaman yang tidak bisa digeser
   ke samping selalu menampilkan 0.
+- `mobile menurut hint` harus `false` dan `ontouchstart` harus `false`. Kalau keduanya benar, situs
+  yang memeriksa ciri ponsel akan menganggap halaman ini desktop. Baris `user agent` dan `platform`
+  menunjukkan apa yang dilihat situs.
 
 Cara kedua, tempel alamat berikut untuk halaman uji kecil:
 
@@ -107,6 +110,23 @@ data:text/html,<h1 id=o></h1><script>document.getElementById('o').textContent='l
 
 Angka `lebar` harus sama dengan ukuran yang dipilih di dropdown. Kalau angkanya selebar layar ponsel
 (misalnya 393), berarti ada situs atau WebView yang menolak meta viewport.
+
+## Memasang pembaruan tanpa menghapus aplikasi
+
+Supaya versi baru bisa dipasang menimpa versi lama, tanda tangan APK harus sama di setiap rilis. Bawaannya, GitHub Actions membuat kunci debug baru di setiap build, sehingga Android menolak pemasangan di atas aplikasi lama.
+
+Perbaikannya sekali saja: buat satu kunci tetap, lalu simpan di repo sebagai secret.
+
+1. Buat keystore (di komputer dengan Java, atau minta dibuatkan) dan ubah jadi base64 satu baris:
+   `base64 -w0 release.jks`
+2. Buka repo, **Settings**, **Secrets and variables**, **Actions**, lalu tambahkan empat secret:
+   `KEYSTORE_BASE64` (seluruh teks base64), `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
+3. Rilis berikutnya otomatis dibangun sebagai APK release bertanda tangan kunci itu, dengan nama
+   `KalBrowser-x.y.z.apk` tanpa akhiran `-debug`.
+
+Sekali saja setelah pindah ke kunci tetap, hapus aplikasi lama karena APK sebelumnya bertanda tangan kunci debug runner. Setelah versi berkunci tetap terpasang, pembaruan berikutnya bisa dipasang langsung.
+
+Simpan cadangan keystore. Kalau hilang, semua rilis berikutnya harus dipasang dengan menghapus aplikasi dulu.
 
 ## Unduh dan unggah
 

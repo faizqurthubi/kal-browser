@@ -206,7 +206,12 @@ object DesktopSpoof {
               'meta viewport: ' + (meta.length ? meta.join(' lalu ') : 'tidak ada'),
               'elemen terlebar: ' + nama,
               'platform: ' + navigator.platform,
-              'titik sentuh: ' + navigator.maxTouchPoints
+              'titik sentuh: ' + navigator.maxTouchPoints,
+              'mobile menurut hint: ' + (navigator.userAgentData
+                ? navigator.userAgentData.mobile
+                : 'tidak tersedia'),
+              'ontouchstart: ' + ('ontouchstart' in window),
+              'user agent: ' + navigator.userAgent
             ];
             return baris.join('\n');
           } catch (e) {
