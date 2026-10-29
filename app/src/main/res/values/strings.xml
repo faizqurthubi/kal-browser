@@ -15,4 +15,7 @@
     <string name="screen_size_value">%1$d × %2$d</string>
 
     <string name="empty_hint">Ketik alamat situs di kolom atas</string>
+
+    <string name="diagnostics_title">Angka yang dilihat halaman</string>
+    <string name="action_close">Tutup</string>
 </resources>

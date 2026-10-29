@@ -83,6 +83,35 @@ class DesktopSpoofTest {
     }
 
     @Test
+    fun `semua meta viewport ditulis bukan hanya yang pertama`() {
+        // Situlah bug yang membuat situs TBK tetap mobile: meta milik situs
+        // ditambahkan setelah script berjalan, dan browser memakai yang terakhir.
+        val script = DesktopSpoof.viewportScript(1920)
+
+        assertThat(script).contains("querySelectorAll('meta[name=viewport]')")
+        assertThat(script).contains("for (var i = 0; i < daftar.length; i++)")
+        assertThat(script).doesNotContain("querySelector('meta[name=viewport]')")
+    }
+
+    @Test
+    fun `membuat meta baru saat halaman belum punya`() {
+        val script = DesktopSpoof.viewportScript(1280)
+
+        assertThat(script).contains("daftar.length === 0")
+        assertThat(script).contains("document.createElement('meta')")
+    }
+
+    @Test
+    fun `script periksa mengembalikan teks biasa`() {
+        val script = DesktopSpoof.diagnosticsScript()
+
+        assertThat(script).contains("window.innerWidth")
+        assertThat(script).contains("visualViewport")
+        assertThat(script).contains("meta[name=viewport]")
+        assertThat(script).contains("navigator.platform")
+    }
+
+    @Test
     fun `pengamat dipasang setelah html ada`() {
         val script = DesktopSpoof.viewportScript(1024)
 
@@ -101,7 +130,7 @@ class DesktopSpoofTest {
         val script = DesktopSpoof.viewportScript(1024)
 
         assertThat(script).contains("new MutationObserver(jadwalkan)")
-        assertThat(script).contains("attributeFilter: ['content']")
+        assertThat(script).contains("attributeFilter: ['content', 'name']")
     }
 
     @Test

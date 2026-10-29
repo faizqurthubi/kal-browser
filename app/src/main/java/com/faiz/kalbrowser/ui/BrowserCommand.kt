@@ -23,4 +23,7 @@ sealed interface BrowserCommand {
      * sudah jadi tidak menghitung ulang tata letak.
      */
     data class ApplyViewport(val width: Int) : BrowserCommand
+
+    /** Meminta Activity membaca angka dari halaman yang sedang terbuka. */
+    data object CollectDiagnostics : BrowserCommand
 }

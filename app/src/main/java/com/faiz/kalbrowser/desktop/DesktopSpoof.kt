@@ -75,14 +75,15 @@ object DesktopSpoof {
      * Memaksa meta viewport memakai lebar layar virtual, sehingga media query CSS
      * dan satuan vh mengikuti ukuran palsu itu, bukan lebar layar ponsel.
      *
-     * Isinya sengaja hanya `width=W`, tanpa `initial-scale`. Kalau `initial-scale=1`
-     * ikut ditulis, browser memaksa skala 1:1 sehingga halaman selebar 1920 CSS px
-     * hanya terlihat potongan kirinya. Tanpa `initial-scale`, browser menghitung
-     * sendiri skala yang membuat seluruh lebar itu muat di kotak WebView.
+     * Dua hal yang mudah salah di sini:
      *
-     * Pengamat DOM ikut dipasang karena banyak situs menulis ulang meta viewport
-     * setelah halaman dimuat. Tanpa pengamat, nilai yang sudah benar akan ditimpa
-     * kembali beberapa ratus milidetik kemudian.
+     * 1. Tanpa `initial-scale`. Kalau ikut ditulis, browser memaksa skala 1:1 dan
+     *    halaman selebar 1920 CSS px hanya terlihat potongan kirinya.
+     * 2. Semua meta viewport harus ditulis, bukan hanya yang pertama. Script ini
+     *    berjalan sebelum parser sempat membaca <head>, jadi meta milik situs
+     *    selalu muncul setelah meta buatan kita. Browser memakai meta yang
+     *    terakhir diproses, dan itu meta situs, sehingga tata letak tetap mengikuti
+     *    device-width.
      */
     fun viewportScript(width: Int): String {
         val safeWidth = width.coerceAtLeast(1)
@@ -94,19 +95,24 @@ object DesktopSpoof {
               function pasang() {
                 var akar = document.documentElement;
                 if (!akar) return false;
-                var m = document.querySelector('meta[name=viewport]');
-                if (!m) {
-                  m = document.createElement('meta');
-                  m.name = 'viewport';
-                  (document.head || akar).appendChild(m);
+
+                var daftar = document.querySelectorAll('meta[name=viewport]');
+                if (daftar.length === 0) {
+                  var baru = document.createElement('meta');
+                  baru.name = 'viewport';
+                  baru.content = ISI;
+                  (document.head || akar).appendChild(baru);
+                  return true;
                 }
-                if (m.content !== ISI) m.content = ISI;
+
+                for (var i = 0; i < daftar.length; i++) {
+                  if (daftar[i].content !== ISI) daftar[i].content = ISI;
+                }
                 return true;
               }
 
               // Document-start kadang berjalan sebelum <html> terbentuk. Satu
-              // percobaan gagal berarti halaman terlanjur disusun selebar ponsel,
-              // jadi dicoba berulang selama frame-frame pertama.
+              // percobaan gagal berarti halaman terlanjur disusun selebar ponsel.
               if (!pasang()) {
                 var coba = 0;
                 var timer = setInterval(function () {
@@ -129,7 +135,7 @@ object DesktopSpoof {
                     childList: true,
                     subtree: true,
                     attributes: true,
-                    attributeFilter: ['content']
+                    attributeFilter: ['content', 'name']
                   });
                   return true;
                 } catch (e) {
@@ -143,6 +149,38 @@ object DesktopSpoof {
             })();
         """.trimIndent()
     }
+
+    /**
+     * Membaca angka yang benar-benar dilihat halaman saat ini, lalu menyusunnya
+     * sebagai teks biasa. Dipakai untuk memeriksa apakah lebar virtual benar
+     * sampai ke halaman, tanpa perlu komputer atau DevTools.
+     */
+    fun diagnosticsScript(): String = """
+        (function () {
+          try {
+            var meta = [];
+            var daftar = document.querySelectorAll('meta[name=viewport]');
+            for (var i = 0; i < daftar.length; i++) {
+              meta.push('"' + daftar[i].content + '"');
+            }
+            var vv = window.visualViewport;
+            var baris = [
+              'lebar halaman: ' + window.innerWidth + ' px',
+              'tinggi halaman: ' + window.innerHeight + ' px',
+              'skala tampilan: ' + (vv ? vv.scale.toFixed(3) : 'tidak tersedia'),
+              'lebar visual: ' + (vv ? Math.round(vv.width) + ' px' : 'tidak tersedia'),
+              'rasio piksel: ' + window.devicePixelRatio,
+              'layar fisik: ' + screen.width + ' x ' + screen.height,
+              'meta viewport: ' + (meta.length ? meta.join(' lalu ') : 'tidak ada'),
+              'platform: ' + navigator.platform,
+              'titik sentuh: ' + navigator.maxTouchPoints
+            ];
+            return baris.join('\n');
+          } catch (e) {
+            return 'pembacaan gagal: ' + e;
+          }
+        })();
+    """.trimIndent()
 
     /** Script lengkap untuk document-start: penyamaran perangkat lalu viewport. */
     fun startScript(desktopUserAgent: String, viewportWidth: Int): String =

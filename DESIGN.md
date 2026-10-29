@@ -154,6 +154,13 @@ Keputusan: `initial-scale` dibuang, meta menjadi `width=W` saja. Tanpa `initial-
 menghitung sendiri skala yang membuat seluruh lebar muat. Ini juga yang dianjurkan dokumentasi MDN
 untuk halaman dengan viewport lebar. Syarat panduan 6.3 menang atas contoh kode di panduan 6.4.
 
-## 11. Yang tidak dijanjikan
+## 11. Alat periksa, bukan fitur
+
+Kata kunci `kal:info` di kolom alamat menampilkan kotak berisi angka yang dilihat halaman. Ini bukan
+fitur produk dan tidak menambah elemen apa pun di chrome: bentuknya kata kunci, bukan tombol atau menu,
+supaya tidak ada satu piksel pun chrome yang dipakai untuk hal yang hanya dipakai saat memeriksa
+masalah. Isinya angka mentah tanpa penilaian, karena tugasnya memberi bukti, bukan memberi kesimpulan.
+
+## 12. Yang tidak dijanjikan
 
 Aplikasi ini tidak menampilkan klaim apa pun tentang seberapa besar kemungkinan sebuah situs mendeteksi mode desktop. Panduan bagian 12 menyebut bahwa sebagian situs tetap bisa mendeteksi WebView lewat sinyal lain. Karena itu tidak ada label "anti deteksi", tidak ada persentase keberhasilan, dan tidak ada daftar situs yang "didukung". Yang bisa dibuktikan hanya perilaku aplikasi, dan itu yang ditampilkan.

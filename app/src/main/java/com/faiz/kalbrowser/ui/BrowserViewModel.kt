@@ -2,6 +2,7 @@ package com.faiz.kalbrowser.ui
 
 import androidx.lifecycle.ViewModel
 import com.faiz.kalbrowser.PRESETS
+import com.faiz.kalbrowser.domain.Diagnostics
 import com.faiz.kalbrowser.domain.UrlNormalizer
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +29,11 @@ class BrowserViewModel : ViewModel() {
     val commands: Flow<BrowserCommand> = _commands.receiveAsFlow()
 
     fun submitAddress(input: String) {
+        if (Diagnostics.isKeyword(input)) {
+            _commands.trySend(BrowserCommand.CollectDiagnostics)
+            return
+        }
+
         val url = UrlNormalizer.toLoadableUrl(input)
         if (url.isEmpty()) return
 

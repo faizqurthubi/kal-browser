@@ -143,6 +143,16 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun `kata kunci periksa tidak dimuat sebagai halaman`() = runTest {
+        val viewModel = BrowserViewModel()
+
+        viewModel.submitAddress("kal:info")
+
+        assertThat(viewModel.commands.first()).isEqualTo(BrowserCommand.CollectDiagnostics)
+        assertThat(viewModel.uiState.value.address).isEmpty()
+    }
+
+    @Test
     fun `tombol muat ulang memuat ulang saat halaman diam`() = runTest {
         val viewModel = BrowserViewModel()
 

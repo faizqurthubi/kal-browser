@@ -82,6 +82,15 @@ Workflow `Build APK` berjalan pada setiap push ke branch mana pun dan pada tombo
 
 ## Memeriksa lebar virtual
 
+Kalau sebuah situs masih tampil dengan tata letak mobile, ada dua cara memeriksanya.
+
+Cara pertama, tempel `kal:info` ke kolom alamat. Muncul kotak berisi angka yang benar-benar dilihat
+halaman, termasuk `lebar halaman`. Angka itu harus sama dengan ukuran yang dipilih di dropdown. Kalau
+angkanya selebar layar ponsel, berarti situs menolak lebar virtual.
+
+Cara kedua, tempel alamat berikut untuk halaman uji kecil:
+
+
 Untuk memastikan halaman benar-benar melihat lebar layar virtual, tempel alamat berikut ke kolom
 alamat. Halaman kecil ini menampilkan lebar, tinggi, dan skala yang dilihat situs.
 

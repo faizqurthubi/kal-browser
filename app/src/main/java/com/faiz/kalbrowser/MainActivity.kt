@@ -19,6 +19,7 @@ import android.widget.FrameLayout
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,10 +27,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.faiz.kalbrowser.PRESETS
 import com.faiz.kalbrowser.databinding.ActivityMainBinding
 import com.faiz.kalbrowser.desktop.DesktopMode
+import com.faiz.kalbrowser.desktop.DesktopSpoof
 import com.faiz.kalbrowser.ui.BrowserCommand
 import com.faiz.kalbrowser.ui.BrowserUiState
 import com.faiz.kalbrowser.ui.BrowserViewModel
 import com.faiz.kalbrowser.ui.Letterbox
+import org.json.JSONTokener
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -239,6 +242,7 @@ class MainActivity : AppCompatActivity() {
                         BrowserCommand.GoForward -> binding.webView.goForward()
                         BrowserCommand.Reload -> binding.webView.reload()
                         BrowserCommand.Stop -> binding.webView.stopLoading()
+                        BrowserCommand.CollectDiagnostics -> showDiagnostics()
                         is BrowserCommand.ApplyViewport -> {
                             desktopMode.setViewportWidth(command.width)
                             // Memuat ulang hanya kalau memang ada halaman. WebView
@@ -277,6 +281,25 @@ class MainActivity : AppCompatActivity() {
             box.height,
             Gravity.CENTER,
         )
+    }
+
+    /**
+     * Membaca angka dari halaman yang sedang terbuka lalu menampilkannya apa
+     * adanya. Nilai dikembalikan WebView sebagai string JSON, jadi tanda kutipnya
+     * dilepas dulu sebelum ditampilkan.
+     */
+    private fun showDiagnostics() {
+        binding.webView.evaluateJavascript(DesktopSpoof.diagnosticsScript()) { hasil ->
+            val teks = runCatching {
+                JSONTokener(hasil).nextValue() as? String
+            }.getOrNull() ?: hasil
+
+            AlertDialog.Builder(this)
+                .setTitle(R.string.diagnostics_title)
+                .setMessage(teks)
+                .setPositiveButton(R.string.action_close, null)
+                .show()
+        }
     }
 
     private fun syncHistory() {
