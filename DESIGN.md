@@ -185,7 +185,36 @@ fitur produk dan tidak menambah elemen apa pun di chrome: bentuknya kata kunci, 
 supaya tidak ada satu piksel pun chrome yang dipakai untuk hal yang hanya dipakai saat memeriksa
 masalah. Isinya angka mentah tanpa penilaian, karena tugasnya memberi bukti, bukan memberi kesimpulan.
 
-## 14. Yang disimpan dan yang tidak
+## 14. Fase 2: chrome dipadatkan
+
+Pemilik meminta tata letak baru. Ini menyimpang dari panduan bagian 5, yang menetapkan bilah atas
+`[kembali][maju][muat ulang][alamat][Buka]` dan baris kedua berisi pemilih ukuran dan tombol tukar.
+Konflik ini disampaikan lebih dulu, dan permintaan pemilik yang dipakai.
+
+Yang berubah dan alasannya:
+
+- **Baris kedua dihapus, isinya masuk menu kebab.** Baris itu setinggi 48 dp dan hanya berisi pilihan
+  yang dipakai sekali di awal sesi. Memindahkannya ke menu memberi 48 dp untuk halaman.
+- **Tombol Buka diganti panah di dalam kotak alamat.** Tombol selebar 58 dp di ujung bilah lebih mahal
+  daripada panah yang menumpang di dalam kotak yang sudah ada. Panah hanya tampil saat dibutuhkan,
+  dan aturannya ada di `AddressAction`: tampil saat kotak difokuskan, atau saat isi kotak berbeda dari
+  alamat halaman. Tanpa bagian kedua, ketikan yang belum dikirim bisa kehilangan jalan keluarnya.
+- **Bilah status selalu disembunyikan.** Ini memberi 24 dp dan membuat pemakaian mendatar terasa
+  seperti layar penuh. Bilah navigasi tetap terlihat karena itu bawaan ponsel. Panduan tidak mengatur
+  bilah status, jadi ini bukan konflik.
+- **Label ukuran tidak lagi selalu terlihat.** Inilah harga yang dibayar dari penghapusan baris kedua.
+  Pemilik memilih menaruhnya di menu saja, dengan centang pada ukuran aktif, dan judul menu menulis
+  nilainya.
+
+Ikon digambar ulang dengan satu aturan yang bisa diperiksa, bukan selera: satu kisi 24, tebal garis 2,
+ujung membulat, tanpa bidang penuh, panjang garis antara 18 dan 38 satuan. Ikon hentikan yang dulu
+bidang penuh 100 satuan persegi diganti silang 28,3 satuan, karena bidang penuh adalah satu-satunya
+ikon yang jenisnya berbeda dari yang lain, dan itulah yang membuatnya terlihat berat.
+
+Satu pengecualian disengaja: ikon menu tetap berupa tiga titik terisi. Bentuk itu sudah dikenal sebagai
+tombol menu di Android, dan menggantinya dengan versi garis justru membuatnya tidak dikenali.
+
+## 15. Yang disimpan dan yang tidak
 
 Ukuran layar dan orientasi virtual disimpan karena itu pilihan yang disengaja pengguna dan memilihnya
 ulang setiap kali membuka aplikasi adalah pekerjaan yang tidak perlu. Alamat terakhir tidak disimpan,
@@ -196,6 +225,6 @@ Pilihan tersimpan yang tidak lagi dikenal dikembalikan ke ukuran bawaan, bukan d
 terdekat. Memotong diam-diam berarti menampilkan halaman pada ukuran yang tidak pernah dipilih
 pengguna, dan itu lebih membingungkan daripada kembali ke titik awal yang dikenal.
 
-## 15. Yang tidak dijanjikan
+## 16. Yang tidak dijanjikan
 
 Aplikasi ini tidak menampilkan klaim apa pun tentang seberapa besar kemungkinan sebuah situs mendeteksi mode desktop. Panduan bagian 12 menyebut bahwa sebagian situs tetap bisa mendeteksi WebView lewat sinyal lain. Karena itu tidak ada label "anti deteksi", tidak ada persentase keberhasilan, dan tidak ada daftar situs yang "didukung". Yang bisa dibuktikan hanya perilaku aplikasi, dan itu yang ditampilkan.

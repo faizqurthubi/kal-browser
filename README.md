@@ -84,8 +84,12 @@ Workflow `Build APK` berjalan pada setiap push ke branch mana pun dan pada tombo
 
 Kalau sebuah situs masih tampil dengan tata letak mobile, ada dua cara memeriksanya.
 
-Cara pertama, tempel `kal:info` ke kolom alamat. Muncul kotak berisi angka yang benar-benar dilihat
-halaman. Yang perlu dibaca:
+Buka menu tiga titik di kanan atas, lalu pilih **Info halaman**. Muncul kotak berisi angka yang
+benar-benar dilihat halaman, dan tombol **Salin** untuk memindahkannya ke papan klip.
+
+`kal:info` yang ditempel ke kolom alamat juga masih jalan, dan hasilnya sama.
+
+Yang perlu dibaca:
 
 - `lebar halaman` harus sama dengan ukuran yang dipilih di dropdown. Kalau angkanya selebar layar
   ponsel, berarti ada yang menolak lebar virtual.
@@ -110,6 +114,18 @@ data:text/html,<h1 id=o></h1><script>document.getElementById('o').textContent='l
 
 Angka `lebar` harus sama dengan ukuran yang dipilih di dropdown. Kalau angkanya selebar layar ponsel
 (misalnya 393), berarti ada situs atau WebView yang menolak meta viewport.
+
+## Bentuk chrome
+
+Bilah atas berisi kembali, maju, muat ulang, kotak alamat, dan menu tiga titik. Satu bilah, 48 dp.
+
+- **Ukuran layar dan tukar orientasi** ada di dalam menu. Ukuran aktif ditandai centang, dan nilainya
+  tertulis sebagai judul di menu.
+- **Panah kirim** ada di dalam kotak alamat, di sisi kanan. Muncul saat kotak sedang dipakai, atau saat
+  isinya berbeda dari alamat halaman yang terbuka.
+- **Bilah status disembunyikan** supaya halaman dapat tinggi penuh. Geser dari tepi atas layar untuk
+  memunculkannya sementara. Bilah navigasi bawah tetap terlihat.
+- **Bilah progres** berupa garis 2 dp di bawah bilah atas, dan hanya muncul saat halaman dimuat.
 
 ## Memasang pembaruan tanpa menghapus aplikasi
 

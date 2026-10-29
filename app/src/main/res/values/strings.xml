@@ -8,11 +8,6 @@
     <string name="action_forward">Maju</string>
     <string name="action_reload">Muat ulang</string>
     <string name="action_stop">Hentikan</string>
-    <string name="action_open">Buka</string>
-    <string name="action_rotate">Tukar lebar dan tinggi</string>
-
-    <string name="screen_size_label">Ukuran layar</string>
-    <string name="screen_size_value">%1$d × %2$d</string>
 
     <string name="empty_hint">Ketik alamat situs di kolom atas</string>
 
@@ -25,4 +20,13 @@
     <string name="download_denied">Izin menyimpan berkas ditolak</string>
     <string name="download_fallback_name">unduhan</string>
     <string name="upload_unavailable">Tidak ada aplikasi pemilih berkas</string>
+
+    <string name="action_go">Buka alamat</string>
+    <string name="action_menu">Menu</string>
+    <string name="menu_screen_size">Ukuran layar</string>
+    <string name="menu_rotate">Tukar lebar dan tinggi</string>
+    <string name="menu_diagnostics">Info halaman</string>
+    <string name="action_copy">Salin</string>
+    <string name="diagnostics_copied">Info halaman tersalin</string>
+    <string name="diagnostics_copy_failed">Info halaman tidak bisa disalin</string>
 </resources>

@@ -2,6 +2,8 @@ package com.faiz.kalbrowser
 
 import android.Manifest
 import android.app.DownloadManager
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,7 +14,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.view.Gravity
+import android.view.Menu
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.CookieManager
@@ -22,9 +26,8 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.AdapterView
 import android.widget.FrameLayout
-import android.widget.ArrayAdapter
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
@@ -33,6 +36,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
@@ -43,6 +47,7 @@ import com.faiz.kalbrowser.data.SharedPreferencesSettings
 import com.faiz.kalbrowser.databinding.ActivityMainBinding
 import com.faiz.kalbrowser.desktop.DesktopMode
 import com.faiz.kalbrowser.desktop.DesktopSpoof
+import com.faiz.kalbrowser.domain.AddressAction
 import com.faiz.kalbrowser.domain.Download
 import com.faiz.kalbrowser.domain.Upload
 import com.faiz.kalbrowser.ui.BrowserCommand
@@ -60,7 +65,6 @@ class MainActivity : AppCompatActivity() {
         BrowserViewModel.factory(SharedPreferencesSettings.from(applicationContext))
     }
     private lateinit var desktopMode: DesktopMode
-    private var updatingSpinnerFromState = false
 
     /** Video fullscreen yang sedang dipinjam WebView, null kalau tidak ada. */
     private var customView: View? = null
@@ -131,6 +135,17 @@ class MainActivity : AppCompatActivity() {
             if (berubah) applyVirtualScreen()
         }
         binding.viewportContainer.post { applyVirtualScreen() }
+
+        // Saat bilah status disembunyikan, isi layar bisa masuk ke area kamera
+        // depan. Mode never menahan jendela di luar area itu, dan karena latar
+        // aplikasi hitam, sisa ruangnya tidak terlihat sebagai kesalahan.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes = window.attributes.apply {
+                layoutInDisplayCutoutMode =
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+            }
+        }
+        terapkanBilahSistem()
     }
 
     private fun setupWebView() {
@@ -192,7 +207,7 @@ class MainActivity : AppCompatActivity() {
                     ),
                 )
                 binding.fullscreenContainer.visibility = View.VISIBLE
-                sembunyikanBilahSistem()
+                terapkanBilahSistem()
             }
 
             override fun onHideCustomView() {
@@ -273,29 +288,9 @@ class MainActivity : AppCompatActivity() {
         binding.buttonBack.setOnClickListener { viewModel.goBack() }
         binding.buttonForward.setOnClickListener { viewModel.goForward() }
         binding.buttonReload.setOnClickListener { viewModel.reloadOrStop() }
-        binding.buttonOpen.setOnClickListener { submitAddress() }
 
-        val presets = ArrayAdapter(this, R.layout.item_screen_size, PRESETS.map { it.label })
-        presets.setDropDownViewResource(R.layout.item_screen_size)
-        binding.screenSizeSpinner.adapter = presets
-        binding.screenSizeSpinner.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long,
-                ) {
-                    // Perubahan dari render state bukan pilihan pengguna, dan
-                    // memprosesnya akan memicu muat ulang berulang.
-                    if (updatingSpinnerFromState) return
-                    viewModel.selectPreset(position)
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-            }
-
-        binding.buttonRotate.setOnClickListener { viewModel.rotate() }
+        binding.buttonMenu.setOnClickListener { showMenu() }
+        binding.buttonGo.setOnClickListener { submitAddress() }
 
         binding.addressBar.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
@@ -305,6 +300,13 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         }
+
+        // Panah di dalam kotak bergantung pada fokus dan pada isi kotak, jadi
+        // keduanya dipantau. Aturannya ada di AddressAction supaya bisa diuji.
+        binding.addressBar.onFocusChangeListener = View.OnFocusChangeListener { _, _ ->
+            perbaruiPanahAlamat()
+        }
+        binding.addressBar.doAfterTextChanged { perbaruiPanahAlamat() }
 
         // Tombol kembali sistem mengikuti riwayat halaman lebih dulu, baru
         // menutup aplikasi, sama seperti browser lain.
@@ -330,6 +332,51 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    /**
+     * Menu berisi semua pilihan yang dulu menempati baris kedua. Ukuran yang
+     * sedang aktif ditandai centang, dan nilainya ditulis di judul supaya tetap
+     * terbaca tanpa harus menghitung baris.
+     */
+    private fun showMenu() {
+        val state = viewModel.uiState.value
+        val menu = PopupMenu(this, binding.buttonMenu)
+        val grupUkuran = 1
+        val idTukar = 900
+        val idInfo = 901
+
+        menu.menu.add(Menu.NONE, Menu.NONE, 0, getString(R.string.menu_screen_size))
+            .apply { isEnabled = false }
+        PRESETS.forEachIndexed { index, preset ->
+            val item = menu.menu.add(grupUkuran, index, index + 1, preset.label)
+            item.isCheckable = true
+            item.isChecked = index == state.selectedPresetIndex
+        }
+        menu.menu.setGroupCheckable(grupUkuran, true, true)
+
+        menu.menu.add(Menu.NONE, idTukar, 100, getString(R.string.menu_rotate))
+            .setIcon(R.drawable.ic_rotate_square)
+        menu.menu.add(Menu.NONE, idInfo, 101, getString(R.string.menu_diagnostics))
+
+        menu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                idTukar -> viewModel.rotate()
+                idInfo -> showDiagnostics()
+                else -> viewModel.selectPreset(item.itemId)
+            }
+            true
+        }
+        menu.show()
+    }
+
+    private fun perbaruiPanahAlamat(state: BrowserUiState = viewModel.uiState.value) {
+        val tampil = AddressAction.shouldShowGo(
+            focused = binding.addressBar.hasFocus(),
+            typed = binding.addressBar.text?.toString().orEmpty(),
+            currentUrl = state.address,
+        )
+        binding.buttonGo.visibility = if (tampil) View.VISIBLE else View.GONE
+    }
+
     private fun submitAddress() {
         val input = binding.addressBar.text?.toString().orEmpty()
         // Fokus dilepas sebelum memuat supaya kolom alamat mau menampilkan alamat
@@ -348,6 +395,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun render(state: BrowserUiState) {
+        perbaruiPanahAlamat(state)
+
         // Kolom alamat hanya ditulis ulang saat tidak sedang difokuskan, kalau
         // tidak kursor ketik akan melompat ke ujung setiap kali progres bergerak.
         if (!binding.addressBar.hasFocus() && binding.addressBar.text.toString() != state.address) {
@@ -364,12 +413,6 @@ class MainActivity : AppCompatActivity() {
             if (state.isLoading) R.string.action_stop else R.string.action_reload,
         )
 
-        if (binding.screenSizeSpinner.selectedItemPosition != state.selectedPresetIndex) {
-            updatingSpinnerFromState = true
-            binding.screenSizeSpinner.setSelection(state.selectedPresetIndex)
-            updatingSpinnerFromState = false
-        }
-        binding.screenSizeLabel.text = state.effectiveSizeLabel
         applyVirtualScreen(state.viewportWidth, state.viewportHeight)
 
         binding.pageProgress.progress = state.progress
@@ -485,7 +528,7 @@ class MainActivity : AppCompatActivity() {
         binding.fullscreenContainer.removeView(view)
         binding.fullscreenContainer.visibility = View.GONE
         customView = null
-        tampilkanBilahSistem()
+        terapkanBilahSistem()
         // Perangkat bisa sudah diputar selama video berjalan, jadi kotak
         // dihitung ulang dari ukuran container yang sekarang.
         binding.viewportContainer.post { applyVirtualScreen() }
@@ -495,18 +538,6 @@ class MainActivity : AppCompatActivity() {
         customViewCallback = null
     }
 
-    private fun sembunyikanBilahSistem() {
-        WindowInsetsControllerCompat(window, window.decorView).apply {
-            systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            hide(WindowInsetsCompat.Type.systemBars())
-        }
-    }
-
-    private fun tampilkanBilahSistem() {
-        WindowInsetsControllerCompat(window, window.decorView)
-            .show(WindowInsetsCompat.Type.systemBars())
-    }
 
     private fun sudahDiizinkan(izin: String): Boolean =
         ContextCompat.checkSelfPermission(this, izin) == PackageManager.PERMISSION_GRANTED
@@ -634,7 +665,48 @@ class MainActivity : AppCompatActivity() {
                 .setTitle(R.string.diagnostics_title)
                 .setMessage(teks)
                 .setPositiveButton(R.string.action_close, null)
+                .setNeutralButton(R.string.action_copy) { _, _ -> salinInfo(teks) }
                 .show()
+        }
+    }
+
+    private fun salinInfo(teks: String) {
+        val papan = getSystemService(ClipboardManager::class.java)
+        val berhasil = try {
+            papan?.setPrimaryClip(ClipData.newPlainText(getString(R.string.diagnostics_title), teks))
+            papan != null
+        } catch (e: SecurityException) {
+            // Sebagian perangkat membatasi papan klip saat aplikasi di latar.
+            false
+        }
+
+        if (!berhasil) {
+            Toast.makeText(this, R.string.diagnostics_copy_failed, Toast.LENGTH_SHORT).show()
+            return
+        }
+        // Android 13 ke atas sudah menampilkan penandanya sendiri, jadi toast
+        // hanya dipakai di versi lama supaya tidak muncul dua kali.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            Toast.makeText(this, R.string.diagnostics_copied, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Bilah status selalu disembunyikan supaya tinggi layar terpakai penuh.
+     * Bilah navigasi dibiarkan terlihat karena itu bawaan ponsel. Digeser dari
+     * tepi atas untuk memunculkan bilah status sementara.
+     */
+    private fun terapkanBilahSistem() {
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+        if (customView != null) {
+            // Video fullscreen menutupi seluruh layar, jadi keduanya disembunyikan.
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+        } else {
+            controller.show(WindowInsetsCompat.Type.navigationBars())
+            controller.hide(WindowInsetsCompat.Type.statusBars())
         }
     }
 
@@ -652,6 +724,7 @@ class MainActivity : AppCompatActivity() {
     // pada saat callback ini berjalan.
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        terapkanBilahSistem()
         binding.viewportContainer.post { applyVirtualScreen() }
     }
 
@@ -663,6 +736,9 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         binding.webView.onResume()
+        // Menggeser bilah status dari tepi atas bisa memunculkannya kembali,
+        // jadi keadaannya dipulihkan setiap aplikasi kembali ke depan.
+        terapkanBilahSistem()
     }
 
     override fun onDestroy() {
