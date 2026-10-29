@@ -19,7 +19,7 @@ Aplikasi masih dibangun bertahap. Yang sudah ada di repo ini:
 | Ukuran layar virtual dan meta viewport `width=W` | Selesai |
 | Tombol tukar lebar dan tinggi | Selesai |
 | Letterbox dan orientasi virtual | Selesai |
-| Fullscreen video, unduh berkas, unggah berkas | Belum |
+| Fullscreen video, unduh berkas, unggah berkas | Selesai |
 | Simpan pengaturan terakhir | Belum |
 
 Artinya APK di Release sekarang sudah melaporkan diri sebagai Chrome di Windows, memaksa halaman memakai lebar layar virtual pilihanmu, dan mengurungnya dalam kotak sesuai rasio virtual dengan tepi hitam. Riwayat pekerjaan per tahap ada di `PANDUAN_DesktopBrowser.md` bagian 10.
@@ -107,6 +107,19 @@ data:text/html,<h1 id=o></h1><script>document.getElementById('o').textContent='l
 
 Angka `lebar` harus sama dengan ukuran yang dipilih di dropdown. Kalau angkanya selebar layar ponsel
 (misalnya 393), berarti ada situs atau WebView yang menolak meta viewport.
+
+## Unduh dan unggah
+
+Berkas yang diunduh dari situs diserahkan ke pengunduh sistem, jadi muncul di aplikasi Unduhan dan
+tetap berjalan walau aplikasi ditutup. Berkas disimpan di folder `Download` HP. Situs yang berkasnya
+butuh sesi tetap bisa diunduh karena cookie ikut dikirim.
+
+Menekan tombol unggah di situs membuka pemilih berkas Android. Kalau situs membatasi jenis berkas,
+pemilihnya hanya menampilkan jenis itu. Beberapa situs mengizinkan lebih dari satu berkas sekaligus,
+dan itu juga didukung.
+
+Video bisa diputar penuh dengan tombol fullscreen di pemutarnya. Bilah status dan toolbar ikut
+tersembunyi, dan tombol kembali menutup video lebih dulu baru mundur ke halaman sebelumnya.
 
 ## Kenapa ukuran besar memakai jalur berbeda
 

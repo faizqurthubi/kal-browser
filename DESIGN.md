@@ -165,13 +165,20 @@ Karena itu jalur transformasi dipakai, tapi hanya saat skala yang dibutuhkan ter
 batas. Ukuran yang masih aman tetap memakai jalur biasa karena teksnya lebih tajam. Ambang dan
 alasannya ada di `ViewportFit`, lengkap dengan test.
 
-## 12. Alat periksa, bukan fitur
+## 12. Fullscreen video memakai latar yang sama
+
+Wadah video fullscreen memakai warna latar yang sama dengan letterbox, bukan hitam baru, supaya
+perpindahan dari halaman ke video tidak terlihat sebagai dua hitam yang berbeda. Toolbar ikut
+tertutup karena video fullscreen bukan lagi bagian dari halaman, dan menyisakan toolbar di atasnya
+akan membuat videonya tidak pernah benar-benar penuh.
+
+## 13. Alat periksa, bukan fitur
 
 Kata kunci `kal:info` di kolom alamat menampilkan kotak berisi angka yang dilihat halaman. Ini bukan
 fitur produk dan tidak menambah elemen apa pun di chrome: bentuknya kata kunci, bukan tombol atau menu,
 supaya tidak ada satu piksel pun chrome yang dipakai untuk hal yang hanya dipakai saat memeriksa
 masalah. Isinya angka mentah tanpa penilaian, karena tugasnya memberi bukti, bukan memberi kesimpulan.
 
-## 13. Yang tidak dijanjikan
+## 14. Yang tidak dijanjikan
 
 Aplikasi ini tidak menampilkan klaim apa pun tentang seberapa besar kemungkinan sebuah situs mendeteksi mode desktop. Panduan bagian 12 menyebut bahwa sebagian situs tetap bisa mendeteksi WebView lewat sinyal lain. Karena itu tidak ada label "anti deteksi", tidak ada persentase keberhasilan, dan tidak ada daftar situs yang "didukung". Yang bisa dibuktikan hanya perilaku aplikasi, dan itu yang ditampilkan.

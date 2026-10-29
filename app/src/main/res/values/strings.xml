@@ -18,4 +18,11 @@
 
     <string name="diagnostics_title">Angka yang dilihat halaman</string>
     <string name="action_close">Tutup</string>
+
+    <string name="download_started">Mengunduh %1$s</string>
+    <string name="download_failed">Unduhan %1$s tidak bisa dimulai</string>
+    <string name="download_unsupported">Alamat ini tidak bisa diunduh langsung</string>
+    <string name="download_denied">Izin menyimpan berkas ditolak</string>
+    <string name="download_fallback_name">unduhan</string>
+    <string name="upload_unavailable">Tidak ada aplikasi pemilih berkas</string>
 </resources>

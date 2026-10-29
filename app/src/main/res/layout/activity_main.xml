@@ -1,112 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/paper"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/toolbar_height">
-
-        <ImageButton
-            android:id="@+id/button_back"
-            style="@style/Widget.KalBrowser.IconButton"
-            android:contentDescription="@string/action_back"
-            android:src="@drawable/ic_back"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/button_forward"
-            style="@style/Widget.KalBrowser.IconButton"
-            android:contentDescription="@string/action_forward"
-            android:src="@drawable/ic_forward"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/button_back"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/button_reload"
-            style="@style/Widget.KalBrowser.IconButton"
-            android:contentDescription="@string/action_reload"
-            android:src="@drawable/ic_reload"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/button_forward"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <EditText
-            android:id="@+id/address_bar"
-            android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/bg_address_bar"
-            android:hint="@string/address_bar_hint"
-            android:imeOptions="actionGo"
-            android:importantForAutofill="no"
-            android:inputType="textUri"
-            android:maxLines="1"
-            android:paddingStart="@dimen/field_padding"
-            android:paddingEnd="@dimen/field_padding"
-            android:selectAllOnFocus="true"
-            android:textColor="@color/ink"
-            android:textColorHint="@color/ink_muted"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/button_open"
-            app:layout_constraintStart_toEndOf="@id/button_reload"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_open"
-            style="@style/Widget.KalBrowser.TextAction"
-            android:text="@string/action_open"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_width"
-        android:background="@color/divider" />
+    android:background="@color/letterbox">
 
     <LinearLayout
+        android:id="@+id/browser_content"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/control_height"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp">
+        android:layout_height="match_parent"
+        android:background="@color/paper"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical">
 
-        <Spinner
-            android:id="@+id/screen_size_spinner"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:contentDescription="@string/screen_size_label"
-            android:spinnerMode="dropdown" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height">
 
-        <TextView
-            android:id="@+id/screen_size_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/gap_tight"
-            android:textColor="@color/ink_muted"
-            android:textSize="13sp" />
+            <ImageButton
+                android:id="@+id/button_back"
+                style="@style/Widget.KalBrowser.IconButton"
+                android:contentDescription="@string/action_back"
+                android:src="@drawable/ic_back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
-            android:id="@+id/button_rotate"
-            style="@style/Widget.KalBrowser.IconButton"
-            android:contentDescription="@string/action_rotate"
-            android:src="@drawable/ic_swap" />
+            <ImageButton
+                android:id="@+id/button_forward"
+                style="@style/Widget.KalBrowser.IconButton"
+                android:contentDescription="@string/action_forward"
+                android:src="@drawable/ic_forward"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/button_back"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/button_reload"
+                style="@style/Widget.KalBrowser.IconButton"
+                android:contentDescription="@string/action_reload"
+                android:src="@drawable/ic_reload"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/button_forward"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/address_bar"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/bg_address_bar"
+                android:hint="@string/address_bar_hint"
+                android:imeOptions="actionGo"
+                android:importantForAutofill="no"
+                android:inputType="textUri"
+                android:maxLines="1"
+                android:paddingStart="@dimen/field_padding"
+                android:paddingEnd="@dimen/field_padding"
+                android:selectAllOnFocus="true"
+                android:textColor="@color/ink"
+                android:textColorHint="@color/ink_muted"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/button_open"
+                app:layout_constraintStart_toEndOf="@id/button_reload"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_open"
+                style="@style/Widget.KalBrowser.TextAction"
+                android:text="@string/action_open"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_width"
+            android:background="@color/divider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/control_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp">
+
+            <Spinner
+                android:id="@+id/screen_size_spinner"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/screen_size_label"
+                android:spinnerMode="dropdown" />
+
+            <TextView
+                android:id="@+id/screen_size_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/gap_tight"
+                android:textColor="@color/ink_muted"
+                android:textSize="13sp" />
+
+            <ImageButton
+                android:id="@+id/button_rotate"
+                style="@style/Widget.KalBrowser.IconButton"
+                android:contentDescription="@string/action_rotate"
+                android:src="@drawable/ic_swap" />
 
     </LinearLayout>
 
@@ -150,4 +156,16 @@
 
     </FrameLayout>
 
-</LinearLayout>
+    </LinearLayout>
+
+    <!-- Wadah video fullscreen diletakkan di lapisan paling atas supaya bisa
+         menutupi toolbar, dan baru dipakai saat halaman memintanya. -->
+    <FrameLayout
+        android:id="@+id/fullscreen_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/letterbox"
+        android:visibility="gone" />
+
+</FrameLayout>
+
