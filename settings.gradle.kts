@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "desktop-browser"
+rootProject.name = "kal-browser"
 include(":app")

@@ -1,4 +1,4 @@
-package com.faiz.desktopbrowser
+package com.faiz.kalbrowser
 
 /**
  * Satu ukuran layar virtual. [w] dan [h] adalah piksel CSS yang dipakai halaman

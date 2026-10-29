@@ -1,4 +1,4 @@
-package com.faiz.desktopbrowser.domain
+package com.faiz.kalbrowser.domain
 
 import java.net.URLEncoder
 

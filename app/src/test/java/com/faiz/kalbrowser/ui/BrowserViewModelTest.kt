@@ -1,4 +1,4 @@
-package com.faiz.desktopbrowser.ui
+package com.faiz.kalbrowser.ui
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first

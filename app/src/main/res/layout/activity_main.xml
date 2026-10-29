@@ -15,7 +15,7 @@
 
         <ImageButton
             android:id="@+id/button_back"
-            style="@style/Widget.DesktopBrowser.IconButton"
+            style="@style/Widget.KalBrowser.IconButton"
             android:contentDescription="@string/action_back"
             android:src="@drawable/ic_back"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -24,7 +24,7 @@
 
         <ImageButton
             android:id="@+id/button_forward"
-            style="@style/Widget.DesktopBrowser.IconButton"
+            style="@style/Widget.KalBrowser.IconButton"
             android:contentDescription="@string/action_forward"
             android:src="@drawable/ic_forward"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -33,7 +33,7 @@
 
         <ImageButton
             android:id="@+id/button_reload"
-            style="@style/Widget.DesktopBrowser.IconButton"
+            style="@style/Widget.KalBrowser.IconButton"
             android:contentDescription="@string/action_reload"
             android:src="@drawable/ic_reload"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -65,7 +65,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_open"
-            style="@style/Widget.DesktopBrowser.TextAction"
+            style="@style/Widget.KalBrowser.TextAction"
             android:text="@string/action_open"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -104,7 +104,7 @@
 
         <ImageButton
             android:id="@+id/button_rotate"
-            style="@style/Widget.DesktopBrowser.IconButton"
+            style="@style/Widget.KalBrowser.IconButton"
             android:contentDescription="@string/action_rotate"
             android:src="@drawable/ic_swap" />
 

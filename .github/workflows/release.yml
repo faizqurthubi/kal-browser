@@ -1,0 +1,111 @@
+name: Rilis APK
+
+# Rilis resmi dibuat dari tag v* , misalnya v1.0.0.
+# workflow_dispatch hanya membangun APK untuk diuji, tanpa membuat Release.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Tentukan versi
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            echo "VERSION_NAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+            echo "RELEASING=true" >> "$GITHUB_ENV"
+          else
+            # Build uji dari tombol Run workflow tidak boleh menulis versi rilis,
+            # jadi nomornya dibedakan lewat potongan commit.
+            echo "VERSION_NAME=0.0.0-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+            echo "RELEASING=false" >> "$GITHUB_ENV"
+          fi
+          # Nomor build selalu naik karena mengikuti nomor run repo ini.
+          echo "VERSION_CODE=${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+
+      - name: Siapkan keystore bila secret tersedia
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "KEYSTORE_PATH=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+            echo "SIGNED=true" >> "$GITHUB_ENV"
+            echo "APK_DITANDATANGANI=true" >> "$GITHUB_ENV"
+          else
+            echo "SIGNED=false" >> "$GITHUB_ENV"
+            echo "APK_DITANDATANGANI=false" >> "$GITHUB_ENV"
+            echo "::warning::Secret keystore belum ada, APK dibangun dengan tanda tangan debug."
+          fi
+
+      - name: Build APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ "$SIGNED" = "true" ]; then
+            gradle assembleRelease --no-daemon --stacktrace
+          else
+            gradle assembleDebug --no-daemon --stacktrace
+          fi
+
+      - name: Siapkan berkas APK dan catatan rilis
+        run: |
+          mkdir -p out
+          if [ "$SIGNED" = "true" ]; then
+            cp app/build/outputs/apk/release/*.apk "out/KalBrowser-${VERSION_NAME}.apk"
+            SIGN_NOTE="APK ditandatangani dengan keystore dari secret repo ini. Versi baru bisa dipasang menimpa versi lama tanpa menghapus aplikasi."
+          else
+            cp app/build/outputs/apk/debug/*.apk "out/KalBrowser-${VERSION_NAME}-debug.apk"
+            SIGN_NOTE="APK ini bertanda tangan debug dari runner GitHub. Tanda tangan debug dibuat ulang di setiap build, jadi versi ini tidak bisa dipasang menimpa versi sebelumnya. Hapus aplikasi lama dulu sebelum memasang. Untuk update tanpa menghapus, siapkan keystore tetap seperti di README."
+          fi
+          {
+            echo "Versi ${VERSION_NAME}, nomor build ${VERSION_CODE}."
+            echo
+            echo "## Cara pasang"
+            echo
+            echo "1. Unduh berkas APK di bawah."
+            echo "2. Buka berkasnya, lalu izinkan pemasangan dari sumber tidak dikenal bila diminta."
+            echo
+            echo "## Tanda tangan"
+            echo
+            echo "$SIGN_NOTE"
+          } > RELEASE_NOTES.md
+
+      - name: Unggah APK sebagai artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: KalBrowser-${{ env.VERSION_NAME }}
+          path: out/*.apk
+          if-no-files-found: error
+
+      - name: Buat GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/*.apk
+          body_path: RELEASE_NOTES.md
+          name: Kal Browser ${{ env.VERSION_NAME }}
+          draft: false
+          prerelease: false

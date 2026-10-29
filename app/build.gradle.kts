@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.faiz.desktopbrowser"
+    namespace = "com.faiz.kalbrowser"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.faiz.desktopbrowser"
+        applicationId = "com.faiz.kalbrowser"
         minSdk = 24
         targetSdk = 34
         // Version diisi workflow dari nama tag, supaya nomor rilis tidak pernah

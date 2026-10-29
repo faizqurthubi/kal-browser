@@ -1,4 +1,4 @@
-package com.faiz.desktopbrowser.ui
+package com.faiz.kalbrowser.ui
 
 /**
  * Seluruh keadaan yang dibaca layar browser. Satu data class, bukan beberapa

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.DesktopBrowser" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.KalBrowser" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/signal</item>
         <item name="colorOnPrimary">@color/on_signal</item>
         <item name="colorSecondary">@color/signal</item>

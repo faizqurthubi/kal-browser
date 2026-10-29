@@ -3,7 +3,7 @@
 
     <!-- Tombol ikon memakai latar ripple tanpa kotak, supaya chrome tidak
          menambah bidang warna yang bersaing dengan halaman web. -->
-    <style name="Widget.DesktopBrowser.IconButton" parent="Widget.AppCompat.ActionButton">
+    <style name="Widget.KalBrowser.IconButton" parent="Widget.AppCompat.ActionButton">
         <item name="android:layout_width">@dimen/icon_button_size</item>
         <item name="android:layout_height">@dimen/icon_button_size</item>
         <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
@@ -14,7 +14,7 @@
 
     <!-- Tombol Buka memakai tinta biasa, bukan warna aksen: aksen disimpan
          untuk bilah progres dan keadaan fokus. -->
-    <style name="Widget.DesktopBrowser.TextAction" parent="Widget.Material3.Button.TextButton">
+    <style name="Widget.KalBrowser.TextAction" parent="Widget.Material3.Button.TextButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">@dimen/toolbar_height</item>
         <item name="android:minWidth">0dp</item>

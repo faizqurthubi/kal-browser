@@ -1,4 +1,4 @@
-package com.faiz.desktopbrowser
+package com.faiz.kalbrowser
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test

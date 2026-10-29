@@ -1,4 +1,4 @@
-package com.faiz.desktopbrowser
+package com.faiz.kalbrowser
 
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
@@ -19,10 +19,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.faiz.desktopbrowser.databinding.ActivityMainBinding
-import com.faiz.desktopbrowser.ui.BrowserCommand
-import com.faiz.desktopbrowser.ui.BrowserUiState
-import com.faiz.desktopbrowser.ui.BrowserViewModel
+import com.faiz.kalbrowser.databinding.ActivityMainBinding
+import com.faiz.kalbrowser.ui.BrowserCommand
+import com.faiz.kalbrowser.ui.BrowserUiState
+import com.faiz.kalbrowser.ui.BrowserViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {

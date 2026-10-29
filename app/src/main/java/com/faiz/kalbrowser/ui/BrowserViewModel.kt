@@ -1,7 +1,7 @@
-package com.faiz.desktopbrowser.ui
+package com.faiz.kalbrowser.ui
 
 import androidx.lifecycle.ViewModel
-import com.faiz.desktopbrowser.domain.UrlNormalizer
+import com.faiz.kalbrowser.domain.UrlNormalizer
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

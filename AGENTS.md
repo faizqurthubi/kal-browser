@@ -1,4 +1,4 @@
-# Desktop Browser
+# Kal Browser
 
 Aplikasi Android satu modul: pembungkus WebView dengan mode desktop.
 

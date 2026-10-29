@@ -1,4 +1,4 @@
-# DESIGN.md: Desktop Browser
+# DESIGN.md: Kal Browser
 
 Dokumen arah desain. Isinya keputusan, bukan saran. Setiap keputusan punya alasan satu baris (R-31).
 
@@ -121,10 +121,12 @@ Pesan gagal menyebut penyebab dan tindakan berikutnya, bukan "Terjadi kesalahan"
 
 Diambil dari panduan, bukan dikarang di sini:
 
-- Nama tampilan: Desktop Browser.
-- Nama paket: `com.faiz.desktopbrowser`.
+- Nama tampilan: Kal Browser.
+- Nama paket: `com.faiz.kalbrowser`.
 - Ukuran layar virtual: 1024 × 768, 1280 × 720, 1366 × 768, 1440 × 900, 1920 × 1080.
 - Orientasi virtual: tombol tukar, yang menukar lebar dan tinggi tanpa memutar layar fisik.
+
+Nama tampilan dan nama paket mengikuti nama repo Kal Browser. Panduan menetapkan nama Desktop Browser dan paket `com.faiz.desktopbrowser`, tapi juga membolehkan paket diganti bila pemilik meminta, dan pemilik meminta namanya Kal Browser.
 
 ## 10. Yang tidak dijanjikan
 

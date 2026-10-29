@@ -1,4 +1,4 @@
-package com.faiz.desktopbrowser.ui
+package com.faiz.kalbrowser.ui
 
 /**
  * Perintah satu kali dari ViewModel ke WebView. Dipisahkan dari
