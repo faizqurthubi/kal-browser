@@ -421,6 +421,12 @@ class MainActivity : AppCompatActivity() {
      * halaman 1920 px tersangkut di skala 25% dan bisa digeser ke samping.
      */
     private fun applyVirtualScreen(virtualWidth: Int, virtualHeight: Int) {
+        // Saat video fullscreen, kotak letterbox tertutup wadah video, jadi
+        // tidak ada gunanya dihitung. Mengubah ukuran WebView justru bisa
+        // mengganggu permukaan video yang sedang dipinjam wadah fullscreen.
+        // Perhitungan diulang begitu video ditutup.
+        if (customView != null) return
+
         val box = Letterbox.boxFor(
             containerWidth = binding.viewportContainer.width,
             containerHeight = binding.viewportContainer.height,
@@ -477,6 +483,9 @@ class MainActivity : AppCompatActivity() {
         binding.fullscreenContainer.visibility = View.GONE
         customView = null
         tampilkanBilahSistem()
+        // Perangkat bisa sudah diputar selama video berjalan, jadi kotak
+        // dihitung ulang dari ukuran container yang sekarang.
+        binding.viewportContainer.post { applyVirtualScreen() }
         // Callback dijawab setelah tampilan pulih, supaya halaman tahu video
         // boleh kembali ke ukuran aslinya.
         customViewCallback?.onCustomViewHidden()

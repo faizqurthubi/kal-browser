@@ -172,6 +172,12 @@ perpindahan dari halaman ke video tidak terlihat sebagai dua hitam yang berbeda.
 tertutup karena video fullscreen bukan lagi bagian dari halaman, dan menyisakan toolbar di atasnya
 akan membuat videonya tidak pernah benar-benar penuh.
 
+Video selebar 16:9 pada layar ponsel tegak akan menyisakan hitam di atas dan bawah. Itu perbandingan
+sisi video, bukan kekurangan aplikasi, dan sama seperti yang terjadi di Chrome pada layar tegak.
+Memutar HP ke mendatar membuat videonya memenuhi layar. Aplikasi tidak memaksa orientasi, karena
+memaksa mendatar akan mengubah arah layar untuk video tegak juga, dan itu keputusan yang bukan
+haknya.
+
 ## 13. Alat periksa, bukan fitur
 
 Kata kunci `kal:info` di kolom alamat menampilkan kotak berisi angka yang dilihat halaman. Ini bukan
