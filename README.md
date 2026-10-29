@@ -115,6 +115,13 @@ data:text/html,<h1 id=o></h1><script>document.getElementById('o').textContent='l
 Angka `lebar` harus sama dengan ukuran yang dipilih di dropdown. Kalau angkanya selebar layar ponsel
 (misalnya 393), berarti ada situs atau WebView yang menolak meta viewport.
 
+## Ikon
+
+Ikon aplikasi digambar sebagai vektor dari gambar acuan pemilik: jendela terminal dengan bar oranye
+dan tulisan `kal bro`. Berkas SVG sumbernya ada di `ikon-kal-browser.svg`, dan tiga bentuk diturunkan
+dari situ: adaptif untuk Android 8 ke atas, monokrom untuk ikon bertema Android 13 ke atas, dan raster
+lima kerapatan untuk Android 7.
+
 ## Bentuk chrome
 
 Bilah atas berisi kembali, maju, muat ulang, kotak alamat, dan menu tiga titik. Satu bilah, 48 dp.

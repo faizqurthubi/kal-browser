@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Versi monokrom untuk ikon bertema Android 13 ke atas. Hanya kerangka jendela dan penanda prompt, karena teks lengkap akan jadi gumpalan saat diwarnai rata. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M30.8,32.5 H77.2 A2.8,2.8 0 0 1 80,35.3 V72.7 A2.8,2.8 0 0 1 77.2,75.5 H30.8 A2.8,2.8 0 0 1 28,72.7 V35.3 A2.8,2.8 0 0 1 30.8,32.5 Z M31.6,34.2 H76.4 A1.9,1.9 0 0 1 78.3,36.1 V71.9 A1.9,1.9 0 0 1 76.4,73.8 H31.6 A1.9,1.9 0 0 1 29.7,71.9 V36.1 A1.9,1.9 0 0 1 31.6,34.2 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M41 51.57Q41 51.84 40.93 51.97Q40.86 52.1 40.69 52.19L35.56 54.84Q35.42 54.9 35.34 54.9Q35.21 54.9 35.09 54.78Q34.97 54.67 34.83 54.39Q34.66 54.05 34.66 53.84Q34.66 53.62 34.9 53.49L38.75 51.57L34.9 49.65Q34.66 49.52 34.66 49.3Q34.66 49.09 34.83 48.75Q34.97 48.48 35.09 48.36Q35.21 48.24 35.34 48.24Q35.42 48.24 35.56 48.3L40.69 50.95Q40.86 51.04 40.93 51.17Q41 51.3 41 51.57Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M48.58 56.8Q48.58 57.04 48.57 57.15Q48.55 57.27 48.52 57.31Q48.48 57.35 48.42 57.35H42.27Q42.2 57.35 42.17 57.31Q42.13 57.27 42.12 57.15Q42.1 57.04 42.1 56.8Q42.1 56.56 42.12 56.44Q42.13 56.32 42.17 56.28Q42.2 56.24 42.27 56.24H48.42Q48.48 56.24 48.52 56.28Q48.55 56.32 48.57 56.44Q48.58 56.56 48.58 56.8Z" />
+</vector>

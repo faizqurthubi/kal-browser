@@ -13,6 +13,4 @@
     <color name="letterbox">#000000</color>
     <!-- Teks di atas letterbox selalu terang, karena letterbox selalu hitam. -->
     <color name="letterbox_text">#A2A7AD</color>
-
-    <color name="launcher_background">#17191C</color>
 </resources>

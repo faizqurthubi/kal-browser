@@ -220,7 +220,27 @@ ikon yang jenisnya berbeda dari yang lain, dan itulah yang membuatnya terlihat b
 Satu pengecualian disengaja: ikon menu tetap berupa tiga titik terisi. Bentuk itu sudah dikenal sebagai
 tombol menu di Android, dan menggantinya dengan versi garis justru membuatnya tidak dikenali.
 
-## 15. Yang disimpan dan yang tidak
+## 15. Ikon peluncur
+
+Ikon mengikuti gambar yang dikirim pemilik: jendela terminal dengan bar oranye, prompt, dan tulisan
+`kal bro`. Bentuknya digambar ulang sebagai vektor, bukan memakai gambar kiriman yang berupa JPEG 2048
+piksel, karena ikon raster akan pecah saat peluncur memperbesarnya dan tidak bisa ikut topeng adaptif.
+
+Yang diukur dari gambar sumber, bukan diperkirakan: warna bar oranye `#C24701`, bingkai `#2B2B2D`,
+badan `#0E0E0E`, proporsi jendela 1,20 banding 1, tinggi bar 12 persen dari jendela, dan kotak setiap
+huruf. Huruf diletakkan satu per satu karena jarak pada gambar sumber tidak sama dengan jarak bawaan
+huruf monospace. Rinciannya ditulis sebagai komentar di `/tmp` pembuat ikon dan di `ikon-kal-browser.svg`.
+
+Tiga bentuk dihasilkan dari satu sumber yang sama:
+
+- **Adaptif** untuk Android 8 ke atas, dengan lapisan depan berisi jendela saja. Jendela dijaga di
+  dalam lingkaran aman berjari-jari 33 dp supaya sudutnya tidak terpotong topeng peluncur mana pun.
+- **Monokrom** untuk ikon bertema Android 13 ke atas. Hanya kerangka jendela dan penanda prompt, karena
+  teks selengkap itu akan menjadi gumpalan saat diwarnai rata oleh sistem.
+- **Raster** untuk Android 7 dan sebagian peluncur lama, dihasilkan dari vektor yang sama pada lima
+  kerapatan, bukan dari gambar kiriman.
+
+## 16. Yang disimpan dan yang tidak
 
 Ukuran layar dan orientasi virtual disimpan karena itu pilihan yang disengaja pengguna dan memilihnya
 ulang setiap kali membuka aplikasi adalah pekerjaan yang tidak perlu. Alamat terakhir tidak disimpan,
@@ -231,6 +251,6 @@ Pilihan tersimpan yang tidak lagi dikenal dikembalikan ke ukuran bawaan, bukan d
 terdekat. Memotong diam-diam berarti menampilkan halaman pada ukuran yang tidak pernah dipilih
 pengguna, dan itu lebih membingungkan daripada kembali ke titik awal yang dikenal.
 
-## 16. Yang tidak dijanjikan
+## 17. Yang tidak dijanjikan
 
 Aplikasi ini tidak menampilkan klaim apa pun tentang seberapa besar kemungkinan sebuah situs mendeteksi mode desktop. Panduan bagian 12 menyebut bahwa sebagian situs tetap bisa mendeteksi WebView lewat sinyal lain. Karena itu tidak ada label "anti deteksi", tidak ada persentase keberhasilan, dan tidak ada daftar situs yang "didukung". Yang bisa dibuktikan hanya perilaku aplikasi, dan itu yang ditampilkan.
