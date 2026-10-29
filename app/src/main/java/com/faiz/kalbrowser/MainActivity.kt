@@ -2,9 +2,11 @@ package com.faiz.kalbrowser
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -13,6 +15,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.AdapterView
+import android.widget.FrameLayout
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -26,6 +29,7 @@ import com.faiz.kalbrowser.desktop.DesktopMode
 import com.faiz.kalbrowser.ui.BrowserCommand
 import com.faiz.kalbrowser.ui.BrowserUiState
 import com.faiz.kalbrowser.ui.BrowserViewModel
+import com.faiz.kalbrowser.ui.Letterbox
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -48,6 +52,14 @@ class MainActivity : AppCompatActivity() {
         setupControls()
         observeUiState()
         observeCommands()
+
+        // Ukuran container baru diketahui setelah layout berjalan, dan berubah
+        // lagi setiap kali keyboard muncul atau perangkat diputar.
+        binding.viewportContainer.addOnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            val berubah = (right - left) != (oldRight - oldLeft) || (bottom - top) != (oldBottom - oldTop)
+            if (berubah) applyVirtualScreen()
+        }
+        binding.viewportContainer.post { applyVirtualScreen() }
     }
 
     private fun setupWebView() {
@@ -203,6 +215,7 @@ class MainActivity : AppCompatActivity() {
             updatingSpinnerFromState = false
         }
         binding.screenSizeLabel.text = state.effectiveSizeLabel
+        applyVirtualScreen(state.viewportWidth, state.viewportHeight)
 
         binding.pageProgress.progress = state.progress
         binding.pageProgress.visibility = if (state.isLoading) View.VISIBLE else View.GONE
@@ -239,6 +252,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun applyVirtualScreen() {
+        val state = viewModel.uiState.value
+        applyVirtualScreen(state.viewportWidth, state.viewportHeight)
+    }
+
+    /**
+     * Mengunci kotak WebView ke rasio layar virtual lalu memusatkannya. Sisa
+     * ruang dibiarkan hitam sesuai latar container, bukan diregangkan.
+     */
+    private fun applyVirtualScreen(virtualWidth: Int, virtualHeight: Int) {
+        val box = Letterbox.boxFor(
+            containerWidth = binding.viewportContainer.width,
+            containerHeight = binding.viewportContainer.height,
+            virtualWidth = virtualWidth,
+            virtualHeight = virtualHeight,
+        ) ?: return
+
+        val current = binding.webView.layoutParams
+        if (current.width == box.width && current.height == box.height) return
+
+        binding.webView.layoutParams = FrameLayout.LayoutParams(
+            box.width,
+            box.height,
+            Gravity.CENTER,
+        )
+    }
+
     private fun syncHistory() {
         viewModel.onHistoryChanged(binding.webView.canGoBack(), binding.webView.canGoForward())
     }
@@ -246,6 +286,14 @@ class MainActivity : AppCompatActivity() {
     private fun hideKeyboard() {
         getSystemService(InputMethodManager::class.java)
             ?.hideSoftInputFromWindow(binding.addressBar.windowToken, 0)
+    }
+
+    // Activity tidak dibuat ulang saat perangkat diputar, jadi kotak harus
+    // dihitung ulang di sini. post dipakai karena ukuran container belum final
+    // pada saat callback ini berjalan.
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        binding.viewportContainer.post { applyVirtualScreen() }
     }
 
     override fun onPause() {

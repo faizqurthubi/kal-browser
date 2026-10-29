@@ -96,6 +96,11 @@ Dua baris di atas, tidak ada apa pun di bawah. Susunan ini mengikuti panduan bag
 
 Alasan susunan: urutan kiri ke kanan mengikuti kebiasaan browser dan arah membaca, jadi tidak perlu dipelajari; baris kedua memisahkan kontrol yang jarang dipakai dari kontrol yang dipakai setiap menit.
 
+Kotak halaman selalu dipusatkan, dan tepi hitam di sekelilingnya tidak diberi apa pun: tanpa label
+ukuran, tanpa garis batas, tanpa corak. Tepi hitam itu bukan bagian dari desain aplikasi, melainkan
+ruang kosong yang muncul karena rasio layar virtual tidak sama dengan rasio layar ponsel. Menghiasnya
+akan membuatnya terlihat seperti bagian yang sengaja didesain, padahal ia hanya sisa.
+
 ## 6. Motion
 
 Hanya dua, keduanya menjawab sesuatu:
