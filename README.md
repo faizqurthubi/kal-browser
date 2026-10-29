@@ -108,6 +108,18 @@ data:text/html,<h1 id=o></h1><script>document.getElementById('o').textContent='l
 Angka `lebar` harus sama dengan ukuran yang dipilih di dropdown. Kalau angkanya selebar layar ponsel
 (misalnya 393), berarti ada situs atau WebView yang menolak meta viewport.
 
+## Kenapa ukuran besar memakai jalur berbeda
+
+Chromium menolak mengecilkan halaman di bawah 25%. Pada layar 393 dp, lebar virtual 1920 px butuh
+skala 20.5%, dan skala itu tidak pernah tercapai. Akibatnya halaman tersangkut di 25%, hanya sekitar
+1571 px yang terlihat, dan sisa 349 px bisa digeser ke samping.
+
+Untuk ukuran seperti itu, WebView diletakkan seukuran layar virtual lalu diperkecil dengan matriks
+View, yang tidak punya batas 25%. Ukuran yang masih sanggup ditangani WebView sendiri tetap memakai
+jalur biasa, karena hasil teksnya lebih tajam. Peralihan ini otomatis.
+
+Pada HP dengan layar 393 dp, batasnya jatuh di antara 1366 dan 1440 pada dropdown ukuran.
+
 ## Batasan
 
 - Mesin render memakai Android System WebView bawaan ponsel. Perbarui **Android System WebView** atau Chrome dari Play Store supaya situs modern tampil benar.

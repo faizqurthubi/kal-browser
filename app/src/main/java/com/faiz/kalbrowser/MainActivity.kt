@@ -32,6 +32,7 @@ import com.faiz.kalbrowser.ui.BrowserCommand
 import com.faiz.kalbrowser.ui.BrowserUiState
 import com.faiz.kalbrowser.ui.BrowserViewModel
 import com.faiz.kalbrowser.ui.Letterbox
+import com.faiz.kalbrowser.ui.ViewportFit
 import org.json.JSONTokener
 import kotlinx.coroutines.launch
 
@@ -264,6 +265,12 @@ class MainActivity : AppCompatActivity() {
     /**
      * Mengunci kotak WebView ke rasio layar virtual lalu memusatkannya. Sisa
      * ruang dibiarkan hitam sesuai latar container, bukan diregangkan.
+     *
+     * Ada dua cara mencapai ukuran kotak itu. Selama WebView masih sanggup
+     * mengecilkan halaman sendiri, biarkan dia yang mengatur. Kalau skala yang
+     * dibutuhkan lebih kecil dari batas Chromium, WebView diletakkan seukuran
+     * layar virtual lalu dikecilkan dengan matriks View. Tanpa jalur kedua,
+     * halaman 1920 px tersangkut di skala 25% dan bisa digeser ke samping.
      */
     private fun applyVirtualScreen(virtualWidth: Int, virtualHeight: Int) {
         val box = Letterbox.boxFor(
@@ -273,12 +280,45 @@ class MainActivity : AppCompatActivity() {
             virtualHeight = virtualHeight,
         ) ?: return
 
-        val current = binding.webView.layoutParams
-        if (current.width == box.width && current.height == box.height) return
+        val density = resources.displayMetrics.density
+        val mode = ViewportFit.modeFor(box.width, density, virtualWidth)
 
+        if (mode == ViewportFit.Mode.Native) {
+            val current = binding.webView.layoutParams
+            val sudahPas = current.width == box.width &&
+                current.height == box.height &&
+                binding.webView.scaleX == 1f &&
+                binding.webView.scaleY == 1f
+            if (sudahPas) return
+
+            // Skala dari jalur transformasi harus dibersihkan, kalau tidak
+            // ukuran barunya mengecil dua kali.
+            binding.webView.scaleX = 1f
+            binding.webView.scaleY = 1f
+            binding.webView.layoutParams = FrameLayout.LayoutParams(
+                box.width,
+                box.height,
+                Gravity.CENTER,
+            )
+            return
+        }
+
+        val current = binding.webView.layoutParams
+        val skala = ViewportFit.transformScale(box.width, virtualWidth)
+        val sudahPas = current.width == virtualWidth &&
+            current.height == virtualHeight &&
+            binding.webView.scaleX == skala
+        if (sudahPas) return
+
+        // Titik pivot di tengah menjaga kotak tetap terpusat setelah diperkecil,
+        // karena layout menempatkan kotak virtual di tengah container.
+        binding.webView.pivotX = virtualWidth / 2f
+        binding.webView.pivotY = virtualHeight / 2f
+        binding.webView.scaleX = skala
+        binding.webView.scaleY = skala
         binding.webView.layoutParams = FrameLayout.LayoutParams(
-            box.width,
-            box.height,
+            virtualWidth,
+            virtualHeight,
             Gravity.CENTER,
         )
     }

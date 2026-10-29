@@ -154,13 +154,24 @@ Keputusan: `initial-scale` dibuang, meta menjadi `width=W` saja. Tanpa `initial-
 menghitung sendiri skala yang membuat seluruh lebar muat. Ini juga yang dianjurkan dokumentasi MDN
 untuk halaman dengan viewport lebar. Syarat panduan 6.3 menang atas contoh kode di panduan 6.4.
 
-## 11. Alat periksa, bukan fitur
+## 11. Batas skala Chromium dan jalur transformasi
+
+Chromium tidak mengecilkan halaman di bawah 25%. Panduan 6.3 menyebut fallback transformasi dan
+memintanya dipakai hanya bila cara utama terbukti bermasalah. Bukti itu sekarang ada: pada layar
+393 dp, lebar virtual 1920 px butuh skala 20.5%, halaman tersangkut di 25%, dan 349 px sisa bisa
+digeser ke samping. Angkanya cocok sampai 1 px dengan laporan pemilik.
+
+Karena itu jalur transformasi dipakai, tapi hanya saat skala yang dibutuhkan terlalu dekat dengan
+batas. Ukuran yang masih aman tetap memakai jalur biasa karena teksnya lebih tajam. Ambang dan
+alasannya ada di `ViewportFit`, lengkap dengan test.
+
+## 12. Alat periksa, bukan fitur
 
 Kata kunci `kal:info` di kolom alamat menampilkan kotak berisi angka yang dilihat halaman. Ini bukan
 fitur produk dan tidak menambah elemen apa pun di chrome: bentuknya kata kunci, bukan tombol atau menu,
 supaya tidak ada satu piksel pun chrome yang dipakai untuk hal yang hanya dipakai saat memeriksa
 masalah. Isinya angka mentah tanpa penilaian, karena tugasnya memberi bukti, bukan memberi kesimpulan.
 
-## 12. Yang tidak dijanjikan
+## 13. Yang tidak dijanjikan
 
 Aplikasi ini tidak menampilkan klaim apa pun tentang seberapa besar kemungkinan sebuah situs mendeteksi mode desktop. Panduan bagian 12 menyebut bahwa sebagian situs tetap bisa mendeteksi WebView lewat sinyal lain. Karena itu tidak ada label "anti deteksi", tidak ada persentase keberhasilan, dan tidak ada daftar situs yang "didukung". Yang bisa dibuktikan hanya perilaku aplikasi, dan itu yang ditampilkan.
