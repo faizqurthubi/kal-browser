@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Satu kotak dengan dua keadaan: garis abu saat diam, garis sinyal saat
+     kolom difokuskan. Aksen hanya dipakai di sini dan di bilah progres. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/paper" />
+            <stroke
+                android:width="1dp"
+                android:color="@color/signal" />
+            <corners android:radius="@dimen/field_radius" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/paper" />
+            <stroke
+                android:width="1dp"
+                android:color="@color/control_border" />
+            <corners android:radius="@dimen/field_radius" />
+        </shape>
+    </item>
+</selector>

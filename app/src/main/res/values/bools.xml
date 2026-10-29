@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dipakai tema untuk ikon status bar, bukan disimpan sebagai warna
+         karena nilainya boolean. -->
+    <bool name="window_light_status_bar">true</bool>
+</resources>

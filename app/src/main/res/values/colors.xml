@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="paper">#FBFBF9</color>
+    <color name="ink">#17191C</color>
+    <color name="ink_muted">#5A5F66</color>
+    <color name="control_border">#7C838B</color>
+    <color name="divider">#D6D8DB</color>
+    <color name="signal">#B4441F</color>
+    <color name="on_signal">#FFFFFF</color>
+
+    <!-- Letterbox tetap hitam di kedua tema: kotak hitam itu meniru tepi
+         monitor virtual, bukan chrome aplikasi. -->
+    <color name="letterbox">#000000</color>
+    <!-- Teks di atas letterbox selalu terang, karena letterbox selalu hitam. -->
+    <color name="letterbox_text">#A2A7AD</color>
+
+    <color name="launcher_background">#17191C</color>
+</resources>

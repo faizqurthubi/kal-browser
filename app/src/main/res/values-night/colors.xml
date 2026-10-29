@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="paper">#101214</color>
+    <color name="ink">#ECEDEE</color>
+    <color name="ink_muted">#A2A7AD</color>
+    <color name="control_border">#666D75</color>
+    <color name="divider">#2A2E33</color>
+    <color name="signal">#E8763F</color>
+    <color name="on_signal">#17191C</color>
+
+    <color name="letterbox">#000000</color>
+</resources>

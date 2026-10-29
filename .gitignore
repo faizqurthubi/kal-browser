@@ -1,0 +1,14 @@
+build/
+.gradle/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Rahasia penandatanganan tidak boleh masuk repo.
+*.jks
+*.keystore
+keystore.properties

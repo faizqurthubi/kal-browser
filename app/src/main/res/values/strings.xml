@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Desktop Browser</string>
+
+    <string name="address_bar_hint">Alamat situs</string>
+
+    <string name="action_back">Kembali</string>
+    <string name="action_forward">Maju</string>
+    <string name="action_reload">Muat ulang</string>
+    <string name="action_stop">Hentikan</string>
+    <string name="action_open">Buka</string>
+    <string name="action_rotate">Tukar lebar dan tinggi</string>
+
+    <string name="screen_size_label">Ukuran layar</string>
+    <string name="screen_size_value">%1$d × %2$d</string>
+
+    <string name="empty_hint">Ketik alamat situs di kolom atas</string>
+</resources>
