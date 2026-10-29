@@ -1,5 +1,7 @@
 package com.faiz.kalbrowser.ui
 
+import com.faiz.kalbrowser.data.BrowserSettings
+import com.faiz.kalbrowser.data.FakeSettingsRepository
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -9,7 +11,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `memuat halaman menyalakan keadaan memuat`() {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
 
         viewModel.onPageStarted("https://example.com")
 
@@ -20,7 +22,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `progres seratus mematikan keadaan memuat`() {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
         viewModel.onPageStarted("https://example.com")
 
         viewModel.onProgressChanged(100)
@@ -30,7 +32,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `progres di luar rentang dipotong`() {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
 
         viewModel.onProgressChanged(140)
 
@@ -39,7 +41,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `kolom alamat kosong tidak mengirim perintah muat`() = runTest {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
 
         viewModel.submitAddress("   ")
 
@@ -48,7 +50,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `menekan go mengirim alamat hasil normalisasi`() = runTest {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
 
         viewModel.submitAddress("example.com")
 
@@ -58,7 +60,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `tombol muat ulang menjadi hentikan saat memuat`() = runTest {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
         viewModel.onPageStarted("https://example.com")
 
         viewModel.reloadOrStop()
@@ -68,7 +70,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `ukuran awal 1280 kali 720`() {
-        val state = BrowserViewModel().uiState.value
+        val state = BrowserViewModel(FakeSettingsRepository()).uiState.value
 
         assertThat(state.viewportWidth).isEqualTo(1280)
         assertThat(state.viewportHeight).isEqualTo(720)
@@ -77,7 +79,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `memilih preset mengubah lebar dan meminta pasang viewport`() = runTest {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
 
         viewModel.selectPreset(4)
 
@@ -87,7 +89,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `preset yang sama tidak memicu perintah lagi`() = runTest {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
         viewModel.selectPreset(2)
         assertThat(viewModel.commands.first()).isEqualTo(BrowserCommand.ApplyViewport(1366))
 
@@ -100,7 +102,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `indeks preset di luar rentang diabaikan`() {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
 
         viewModel.selectPreset(99)
         viewModel.selectPreset(-1)
@@ -111,7 +113,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `rotate menukar lebar dan tinggi`() = runTest {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
 
         viewModel.rotate()
 
@@ -124,7 +126,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `rotate dua kali kembali ke ukuran semula`() {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
 
         viewModel.rotate()
         viewModel.rotate()
@@ -134,7 +136,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `preset dan orientasi digabung dengan benar`() {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
 
         viewModel.selectPreset(4)
         viewModel.rotate()
@@ -144,7 +146,7 @@ class BrowserViewModelTest {
 
     @Test
     fun `kata kunci periksa tidak dimuat sebagai halaman`() = runTest {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
 
         viewModel.submitAddress("kal:info")
 
@@ -154,10 +156,62 @@ class BrowserViewModelTest {
 
     @Test
     fun `tombol muat ulang memuat ulang saat halaman diam`() = runTest {
-        val viewModel = BrowserViewModel()
+        val viewModel = BrowserViewModel(FakeSettingsRepository())
 
         viewModel.reloadOrStop()
 
         assertThat(viewModel.commands.first()).isEqualTo(BrowserCommand.Reload)
+    }
+
+    @Test
+    fun `ukuran tersimpan dipakai saat view model dibuat`() {
+        val settings = FakeSettingsRepository(BrowserSettings(presetIndex = 4, isPortrait = true))
+
+        val viewModel = BrowserViewModel(settings)
+
+        assertThat(viewModel.uiState.value.selectedPresetIndex).isEqualTo(4)
+        assertThat(viewModel.uiState.value.isPortrait).isTrue()
+    }
+
+    @Test
+    fun `memilih ukuran menyimpan pilihan`() {
+        val settings = FakeSettingsRepository()
+
+        val viewModel = BrowserViewModel(settings)
+        viewModel.selectPreset(3)
+
+        assertThat(settings.isiTersimpan().presetIndex).isEqualTo(3)
+        assertThat(settings.jumlahSimpan).isEqualTo(1)
+    }
+
+    @Test
+    fun `menukar orientasi menyimpan pilihan`() {
+        val settings = FakeSettingsRepository()
+
+        val viewModel = BrowserViewModel(settings)
+        viewModel.rotate()
+
+        assertThat(settings.isiTersimpan().isPortrait).isTrue()
+    }
+
+    @Test
+    fun `indeks di luar daftar dijatuhkan ke preset bawaan`() {
+        // Bisa terjadi bila daftar preset berubah di versi berikutnya.
+        val settings = FakeSettingsRepository(BrowserSettings(presetIndex = 99, isPortrait = false))
+
+        val viewModel = BrowserViewModel(settings)
+
+        assertThat(viewModel.uiState.value.selectedPresetIndex)
+            .isEqualTo(BrowserUiState.DEFAULT_PRESET_INDEX)
+    }
+
+    @Test
+    fun `memilih ukuran yang sama tidak menyimpan ulang`() {
+        val settings = FakeSettingsRepository()
+
+        val viewModel = BrowserViewModel(settings)
+        viewModel.selectPreset(viewModel.uiState.value.selectedPresetIndex)
+
+        assertThat(settings.jumlahSimpan).isEqualTo(0)
     }
 }

@@ -39,6 +39,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.faiz.kalbrowser.PRESETS
+import com.faiz.kalbrowser.data.SharedPreferencesSettings
 import com.faiz.kalbrowser.databinding.ActivityMainBinding
 import com.faiz.kalbrowser.desktop.DesktopMode
 import com.faiz.kalbrowser.desktop.DesktopSpoof
@@ -55,7 +56,9 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: BrowserViewModel by viewModels()
+    private val viewModel: BrowserViewModel by viewModels {
+        BrowserViewModel.factory(SharedPreferencesSettings.from(applicationContext))
+    }
     private lateinit var desktopMode: DesktopMode
     private var updatingSpinnerFromState = false
 

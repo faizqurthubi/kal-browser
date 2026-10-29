@@ -185,6 +185,17 @@ fitur produk dan tidak menambah elemen apa pun di chrome: bentuknya kata kunci, 
 supaya tidak ada satu piksel pun chrome yang dipakai untuk hal yang hanya dipakai saat memeriksa
 masalah. Isinya angka mentah tanpa penilaian, karena tugasnya memberi bukti, bukan memberi kesimpulan.
 
-## 14. Yang tidak dijanjikan
+## 14. Yang disimpan dan yang tidak
+
+Ukuran layar dan orientasi virtual disimpan karena itu pilihan yang disengaja pengguna dan memilihnya
+ulang setiap kali membuka aplikasi adalah pekerjaan yang tidak perlu. Alamat terakhir tidak disimpan,
+karena aplikasi yang terbuka langsung ke halaman kemarin terasa tidak pernah ditutup, dan pengguna
+kehilangan satu-satunya tanda bahwa sesi sebelumnya sudah berakhir.
+
+Pilihan tersimpan yang tidak lagi dikenal dikembalikan ke ukuran bawaan, bukan dipotong ke ukuran
+terdekat. Memotong diam-diam berarti menampilkan halaman pada ukuran yang tidak pernah dipilih
+pengguna, dan itu lebih membingungkan daripada kembali ke titik awal yang dikenal.
+
+## 15. Yang tidak dijanjikan
 
 Aplikasi ini tidak menampilkan klaim apa pun tentang seberapa besar kemungkinan sebuah situs mendeteksi mode desktop. Panduan bagian 12 menyebut bahwa sebagian situs tetap bisa mendeteksi WebView lewat sinyal lain. Karena itu tidak ada label "anti deteksi", tidak ada persentase keberhasilan, dan tidak ada daftar situs yang "didukung". Yang bisa dibuktikan hanya perilaku aplikasi, dan itu yang ditampilkan.

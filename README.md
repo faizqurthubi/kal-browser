@@ -20,7 +20,7 @@ Aplikasi masih dibangun bertahap. Yang sudah ada di repo ini:
 | Tombol tukar lebar dan tinggi | Selesai |
 | Letterbox dan orientasi virtual | Selesai |
 | Fullscreen video, unduh berkas, unggah berkas | Selesai |
-| Simpan pengaturan terakhir | Belum |
+| Simpan pengaturan terakhir | Selesai |
 
 Artinya APK di Release sekarang sudah melaporkan diri sebagai Chrome di Windows, memaksa halaman memakai lebar layar virtual pilihanmu, dan mengurungnya dalam kotak sesuai rasio virtual dengan tepi hitam. Riwayat pekerjaan per tahap ada di `PANDUAN_DesktopBrowser.md` bagian 10.
 
@@ -137,7 +137,11 @@ Pada HP dengan layar 393 dp, batasnya jatuh di antara 1366 dan 1440 pada dropdow
 
 - Mesin render memakai Android System WebView bawaan ponsel. Perbarui **Android System WebView** atau Chrome dari Play Store supaya situs modern tampil benar.
 - Sebagian situs tetap bisa mendeteksi bahwa halaman dibuka di WebView walaupun User-Agent sudah dipalsukan. Itu batas mesin render, bukan kesalahan aplikasi.
-- Aplikasi belum menyimpan alamat terakhir dan ukuran layar, jadi pengaturan kembali ke 1280 × 720 setiap aplikasi dibuka. Penyimpanan masuk tahap berikutnya.
+- Ukuran layar dan orientasi virtual tersimpan, tapi alamat terakhir sengaja tidak. Aplikasi selalu
+  dibuka dalam keadaan kosong, karena langsung memuat halaman lama terasa seperti aplikasi yang tidak
+  pernah benar-benar ditutup.
+- Kalau daftar ukuran berubah di versi berikutnya, pilihan tersimpan yang tidak lagi dikenal
+  dikembalikan ke 1280 × 720, bukan ke ukuran lain yang tidak pernah dipilih.
 
 ## Isi repo
 
@@ -146,7 +150,8 @@ app/src/main/java/com/faiz/kalbrowser/
   MainActivity.kt          Activity, WebView, penyambung ke ViewModel
   ScreenPreset.kt          Daftar ukuran layar virtual
   ui/                      State dan ViewModel
-  domain/                  Aturan alamat
+  domain/                  Aturan alamat, unduhan, unggahan, alat periksa
+  data/                    Penyimpanan pengaturan
 app/src/main/res/          Layout, tema, ikon
 .github/workflows/         build.yml untuk uji, release.yml untuk rilis
 DESIGN.md                  Arah desain dan alasannya

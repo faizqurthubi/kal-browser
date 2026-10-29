@@ -1,7 +1,12 @@
 package com.faiz.kalbrowser.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.faiz.kalbrowser.PRESETS
+import com.faiz.kalbrowser.data.BrowserSettings
+import com.faiz.kalbrowser.data.SettingsRepository
 import com.faiz.kalbrowser.domain.Diagnostics
 import com.faiz.kalbrowser.domain.UrlNormalizer
 import kotlinx.coroutines.channels.Channel
@@ -17,9 +22,13 @@ import kotlinx.coroutines.flow.update
  * menyimpan keputusan apa pun: ia melaporkan apa yang terjadi lewat [onPageStarted]
  * dan kawan-kawan, lalu menjalankan perintah yang datang dari [commands].
  */
-class BrowserViewModel : ViewModel() {
+class BrowserViewModel(
+    private val settings: SettingsRepository,
+) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(BrowserUiState())
+    // Keadaan awal diambil dari pengaturan tersimpan, supaya ukuran yang dipilih
+    // terakhir tidak perlu dipilih ulang setiap aplikasi dibuka.
+    private val _uiState = MutableStateFlow(stateAwal())
     val uiState: StateFlow<BrowserUiState> = _uiState.asStateFlow()
 
     // Channel, bukan StateFlow: perintah yang terlewat tidak boleh diputar ulang
@@ -60,12 +69,14 @@ class BrowserViewModel : ViewModel() {
         if (index == _uiState.value.selectedPresetIndex) return
 
         _uiState.update { it.copy(selectedPresetIndex = index) }
+        simpanPengaturan()
         _commands.trySend(BrowserCommand.ApplyViewport(_uiState.value.viewportWidth))
     }
 
     /** Menukar lebar dan tinggi virtual tanpa memutar layar fisik. */
     fun rotate() {
         _uiState.update { it.copy(isPortrait = !it.isPortrait) }
+        simpanPengaturan()
         _commands.trySend(BrowserCommand.ApplyViewport(_uiState.value.viewportWidth))
     }
 
@@ -88,5 +99,24 @@ class BrowserViewModel : ViewModel() {
 
     fun onHistoryChanged(canGoBack: Boolean, canGoForward: Boolean) {
         _uiState.update { it.copy(canGoBack = canGoBack, canGoForward = canGoForward) }
+    }
+
+    private fun stateAwal(): BrowserUiState {
+        val tersimpan = settings.load().sanitized()
+        return BrowserUiState(
+            selectedPresetIndex = tersimpan.presetIndex,
+            isPortrait = tersimpan.isPortrait,
+        )
+    }
+
+    private fun simpanPengaturan() {
+        val state = _uiState.value
+        settings.save(BrowserSettings(state.selectedPresetIndex, state.isPortrait))
+    }
+
+    companion object {
+        fun factory(settings: SettingsRepository): ViewModelProvider.Factory = viewModelFactory {
+            initializer { BrowserViewModel(settings) }
+        }
     }
 }
