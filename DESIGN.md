@@ -16,6 +16,10 @@ Aplikasi ini alat, bukan produk yang dipamerkan.
 - Tidak ada angka atau klaim yang tidak bisa dibuktikan: tanpa statistik, tanpa logo pelanggan, tanpa testimoni, tanpa label "cepat" atau "aman" di UI.
 - Chrome browser sebesar kebutuhan. Setiap piksel tetap yang dipakai chrome adalah piksel yang hilang dari halaman web, dan halaman web adalah alasan aplikasi ini ada.
 - Satu layar. Tidak ada onboarding, tidak ada tab, tidak ada beranda, tidak ada carousel.
+- Mode desktop tidak menambah elemen visual apa pun. Tidak ada lencana "Desktop" atau ikon
+  monitor, karena status itu tidak bisa dipastikan dari sisi aplikasi: situs tetap bisa
+  mendeteksi WebView lewat sinyal lain (panduan bagian 12). Lencana yang mengklaim sesuatu
+  yang tidak bisa dibuktikan melanggar aturan no-claims yang sama dengan statistik palsu.
 
 Alasan: pengguna membuka aplikasi ini untuk melihat satu situs, bukan untuk melihat aplikasi ini.
 

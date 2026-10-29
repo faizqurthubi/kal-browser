@@ -15,13 +15,14 @@ Aplikasi masih dibangun bertahap. Yang sudah ada di repo ini:
 | Aturan alamat: pencarian, tambah `https://` | Selesai |
 | Bilah progres dan keadaan kosong | Selesai |
 | Build dan rilis lewat GitHub Actions | Selesai |
-| Mode desktop: User-Agent, Client Hints, meta viewport | Belum |
+| Mode desktop: User-Agent, Client Hints, platform, maxTouchPoints | Selesai |
+| Meta viewport `width=W` | Belum |
 | Ukuran layar virtual dan tombol tukar | Belum |
 | Letterbox | Belum |
 | Fullscreen video, unduh berkas, unggah berkas | Belum |
 | Simpan pengaturan terakhir | Belum |
 
-Artinya APK yang ada di Release sekarang bisa membuka situs biasa, tapi belum memaksa mode desktop dan belum memasang letterbox. Riwayat pekerjaan per tahap ada di `PANDUAN_DesktopBrowser.md` bagian 10.
+Artinya APK di Release sekarang sudah melaporkan diri sebagai Chrome di Windows, tapi belum mengubah lebar tata letak halaman dan belum memasang letterbox. Riwayat pekerjaan per tahap ada di `PANDUAN_DesktopBrowser.md` bagian 10.
 
 ## Unduh dan pasang
 

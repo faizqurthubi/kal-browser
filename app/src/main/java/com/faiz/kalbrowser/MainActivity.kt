@@ -1,6 +1,5 @@
 package com.faiz.kalbrowser
 
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
@@ -20,6 +19,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.faiz.kalbrowser.databinding.ActivityMainBinding
+import com.faiz.kalbrowser.desktop.DesktopMode
 import com.faiz.kalbrowser.ui.BrowserCommand
 import com.faiz.kalbrowser.ui.BrowserUiState
 import com.faiz.kalbrowser.ui.BrowserViewModel
@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: BrowserViewModel by viewModels()
+    private lateinit var desktopMode: DesktopMode
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,17 +46,10 @@ class MainActivity : AppCompatActivity() {
         observeCommands()
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
-        with(binding.webView.settings) {
-            javaScriptEnabled = true
-            domStorageEnabled = true
-            useWideViewPort = true
-            loadWithOverviewMode = true
-            setSupportZoom(true)
-            builtInZoomControls = true
-            displayZoomControls = false
-        }
+        // Semua penyetelan WebSettings dan penyamaran desktop ada di DesktopMode,
+        // supaya Activity tinggal mengurus tampilan dan navigasi.
+        desktopMode = DesktopMode(binding.webView).also { it.apply() }
 
         binding.webView.webViewClient = object : WebViewClient() {
 
