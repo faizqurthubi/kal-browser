@@ -14,118 +14,128 @@
         android:fitsSystemWindows="true"
         android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/toolbar"
+        <!-- Bilah alamat dan kawan-kawannya dibungkus satu wadah supaya bisa
+             menyingkir bersama. Bilah status sistem tidak ikut disembunyikan. -->
+        <LinearLayout
+            android:id="@+id/chrome_bar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/toolbar_height">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <ImageButton
-                android:id="@+id/button_back"
-                style="@style/Widget.KalBrowser.IconButton"
-                android:contentDescription="@string/action_back"
-                android:src="@drawable/ic_back"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/toolbar_height">
 
-            <ImageButton
-                android:id="@+id/button_forward"
-                style="@style/Widget.KalBrowser.IconButton"
-                android:contentDescription="@string/action_forward"
-                android:src="@drawable/ic_forward"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/button_back"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- Ujung kanan tombol ini ditarik 4 dp lebih dekat ke kotak alamat,
-                 supaya jarak ikon ke kotak tinggal 8 dp. Padding asimetris
-                 dipakai, bukan tombol yang dikecilkan, karena sasaran sentuh
-                 tetap harus 48 dp. -->
-            <ImageButton
-                android:id="@+id/button_reload"
-                style="@style/Widget.KalBrowser.IconButton"
-                android:contentDescription="@string/action_reload"
-                android:paddingStart="12dp"
-                android:paddingEnd="4dp"
-                android:src="@drawable/ic_reload"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/button_forward"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <FrameLayout
-                android:id="@+id/address_field"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/field_height"
-                android:background="@drawable/bg_address_bar"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/button_menu"
-                app:layout_constraintStart_toEndOf="@id/button_reload"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <EditText
-                    android:id="@+id/address_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@null"
-                    android:hint="@string/address_bar_hint"
-                    android:imeOptions="actionGo"
-                    android:importantForAutofill="no"
-                    android:inputType="textUri"
-                    android:maxLines="1"
-                    android:paddingStart="@dimen/field_padding"
-                    android:paddingEnd="40dp"
-                    android:selectAllOnFocus="true"
-                    android:textColor="@color/ink"
-                    android:textColorHint="@color/ink_muted"
-                    android:textSize="14sp" />
-
-                <!-- Panah kirim berada di dalam kotak, dan hanya muncul saat
-                     dibutuhkan. Jarak kanan teks 40 dp menyisakan tempat untuk
-                     panah ini supaya alamat panjang tidak tertutup. -->
                 <ImageButton
-                    android:id="@+id/button_go"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="end|center_vertical"
-                    android:layout_marginEnd="2dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/action_go"
-                    android:padding="6dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_arrow_right"
-                    android:tint="@color/ink"
-                    android:visibility="gone" />
+                    android:id="@+id/button_back"
+                    style="@style/Widget.KalBrowser.IconButton"
+                    android:contentDescription="@string/action_back"
+                    android:src="@drawable/ic_back"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            </FrameLayout>
+                <ImageButton
+                    android:id="@+id/button_forward"
+                    style="@style/Widget.KalBrowser.IconButton"
+                    android:contentDescription="@string/action_forward"
+                    android:src="@drawable/ic_forward"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/button_back"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageButton
-                android:id="@+id/button_menu"
-                style="@style/Widget.KalBrowser.IconButton"
-                android:contentDescription="@string/action_menu"
-                android:paddingStart="4dp"
-                android:paddingEnd="12dp"
-                android:src="@drawable/ic_more_vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <!-- Ujung kanan tombol ini ditarik 4 dp lebih dekat ke kotak alamat,
+                     supaya jarak ikon ke kotak tinggal 8 dp. Padding asimetris
+                     dipakai, bukan tombol yang dikecilkan, karena sasaran sentuh
+                     tetap harus 48 dp. -->
+                <ImageButton
+                    android:id="@+id/button_reload"
+                    style="@style/Widget.KalBrowser.IconButton"
+                    android:contentDescription="@string/action_reload"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="4dp"
+                    android:src="@drawable/ic_reload"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/button_forward"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <FrameLayout
+                    android:id="@+id/address_field"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/field_height"
+                    android:background="@drawable/bg_address_bar"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/button_menu"
+                    app:layout_constraintStart_toEndOf="@id/button_reload"
+                    app:layout_constraintTop_toTopOf="parent">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/divider_width"
-            android:background="@color/divider" />
+                    <EditText
+                        android:id="@+id/address_bar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:hint="@string/address_bar_hint"
+                        android:imeOptions="actionGo"
+                        android:importantForAutofill="no"
+                        android:inputType="textUri"
+                        android:maxLines="1"
+                        android:paddingStart="@dimen/field_padding"
+                        android:paddingEnd="40dp"
+                        android:selectAllOnFocus="true"
+                        android:textColor="@color/ink"
+                        android:textColorHint="@color/ink_muted"
+                        android:textSize="14sp" />
 
-        <!-- Progres tetap di chrome, bukan di dalam menu. Ia penanda keadaan
-             yang sedang berjalan, bukan pilihan. -->
-        <ProgressBar
-            android:id="@+id/page_progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/progress_height"
-            android:indeterminate="false"
-            android:progressTint="@color/signal"
-            android:visibility="gone" />
+                    <!-- Panah kirim berada di dalam kotak, dan hanya muncul saat
+                         dibutuhkan. Jarak kanan teks 40 dp menyisakan tempat untuk
+                         panah ini supaya alamat panjang tidak tertutup. -->
+                    <ImageButton
+                        android:id="@+id/button_go"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="2dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/action_go"
+                        android:padding="6dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_arrow_right"
+                        android:tint="@color/ink"
+                        android:visibility="gone" />
+
+                </FrameLayout>
+
+                <ImageButton
+                    android:id="@+id/button_menu"
+                    style="@style/Widget.KalBrowser.IconButton"
+                    android:contentDescription="@string/action_menu"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="12dp"
+                    android:src="@drawable/ic_more_vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_width"
+                android:background="@color/divider" />
+
+            <!-- Progres tetap di chrome, bukan di dalam menu. Ia penanda keadaan
+                 yang sedang berjalan, bukan pilihan. -->
+            <ProgressBar
+                android:id="@+id/page_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/progress_height"
+                android:indeterminate="false"
+                android:progressTint="@color/signal"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
         <FrameLayout
             android:id="@+id/viewport_container"

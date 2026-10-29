@@ -199,9 +199,15 @@ Yang berubah dan alasannya:
   daripada panah yang menumpang di dalam kotak yang sudah ada. Panah hanya tampil saat dibutuhkan,
   dan aturannya ada di `AddressAction`: tampil saat kotak difokuskan, atau saat isi kotak berbeda dari
   alamat halaman. Tanpa bagian kedua, ketikan yang belum dikirim bisa kehilangan jalan keluarnya.
-- **Bilah status selalu disembunyikan.** Ini memberi 24 dp dan membuat pemakaian mendatar terasa
-  seperti layar penuh. Bilah navigasi tetap terlihat karena itu bawaan ponsel. Panduan tidak mengatur
-  bilah status, jadi ini bukan konflik.
+- **Bilah alamat menyembunyikan diri saat halaman digulir ke bawah.** Ini memberi 48 dp tambahan justru
+  saat dibutuhkan, yaitu ketika halaman sedang dibaca, dan mengembalikannya saat pengguna menggulir
+  naik atau berpindah halaman. Bilah status dan bilah navigasi sistem tidak disentuh, karena keduanya
+  bukan bagian aplikasi dan pengguna membutuhkannya untuk melihat jam dan baterai.
+
+  Dua pengecualian disengaja. Di puncak halaman bilah selalu terlihat, karena bilah yang tersembunyi
+  di puncak tidak bisa dipanggil kembali tanpa menggulir naik, dan itu mustahil. Selama kolom alamat
+  dipakai, bilah juga tidak pernah menyingkir, karena papan ketik akan menutupi kolom yang sedang
+  diisi. Aturannya ada di `ChromeVisibility` dengan test, bukan tersebar di dalam Activity.
 - **Label ukuran tidak lagi selalu terlihat.** Inilah harga yang dibayar dari penghapusan baris kedua.
   Pemilik memilih menaruhnya di menu saja, dengan centang pada ukuran aktif, dan judul menu menulis
   nilainya.

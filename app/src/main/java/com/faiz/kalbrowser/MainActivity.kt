@@ -48,6 +48,7 @@ import com.faiz.kalbrowser.databinding.ActivityMainBinding
 import com.faiz.kalbrowser.desktop.DesktopMode
 import com.faiz.kalbrowser.desktop.DesktopSpoof
 import com.faiz.kalbrowser.domain.AddressAction
+import com.faiz.kalbrowser.domain.ChromeVisibility
 import com.faiz.kalbrowser.domain.Download
 import com.faiz.kalbrowser.domain.Upload
 import com.faiz.kalbrowser.ui.BrowserCommand
@@ -78,6 +79,19 @@ class MainActivity : AppCompatActivity() {
 
     /** Unduhan yang menunggu izin tulis, hanya dipakai di Android 9 ke bawah. */
     private var unduhanTertunda: PermintaanUnduh? = null
+
+    /** Keadaan bilah alamat, dan tingginya saat terakhir terlihat. */
+    private var chromeTersembunyi = false
+    private var tinggiChrome = 0
+
+    /** Getaran gulir sekecil ini tidak dianggap niat menyembunyikan bilah. */
+    private val ambangGulir by lazy { (8 * resources.displayMetrics.density).toInt() }
+
+    private companion object {
+        /** Cukup cepat supaya terasa mengikuti jari, cukup lambat supaya terlihat. */
+        const val SEMBUNYI_DURASI = 180L
+        const val TAMPIL_DURASI = 150L
+    }
 
     private data class PermintaanUnduh(
         val url: String,
@@ -165,6 +179,9 @@ class MainActivity : AppCompatActivity() {
                 viewModel.onPageStarted(url.orEmpty())
                 desktopMode.injectViewportNow()
                 syncHistory()
+                // Halaman baru selalu dimulai dengan bilah terlihat, supaya
+                // alamat dan progres muat tidak tersembunyi di luar layar.
+                tampilkanChrome()
             }
 
             override fun onPageFinished(view: WebView, url: String?) {
@@ -262,6 +279,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Bilah alamat menyingkir saat halaman digulir ke bawah dan kembali saat
+        // digulir ke atas. Aturan kapan boleh menyingkir ada di ChromeVisibility.
+        binding.webView.setOnScrollChangeListener { _, _, posisi, _, posisiLama ->
+            when (
+                ChromeVisibility.putuskan(
+                    tersembunyi = chromeTersembunyi,
+                    geser = posisi - posisiLama,
+                    posisiGulir = posisi,
+                    ambang = ambangGulir,
+                    alamatDifokuskan = binding.addressBar.hasFocus(),
+                )
+            ) {
+                ChromeVisibility.Aksi.Sembunyikan -> sembunyikanChrome()
+                ChromeVisibility.Aksi.Tampilkan -> tampilkanChrome()
+                ChromeVisibility.Aksi.TidakBerubah -> Unit
+            }
+        }
+
         // Berkas diserahkan ke pengunduh sistem, bukan diunduh sendiri, supaya
         // muncul di aplikasi Unduhan dan tahan walau aplikasi ditutup.
         binding.webView.setDownloadListener { url, userAgent, contentDisposition, mimeType, _ ->
@@ -303,7 +338,8 @@ class MainActivity : AppCompatActivity() {
 
         // Panah di dalam kotak bergantung pada fokus dan pada isi kotak, jadi
         // keduanya dipantau. Aturannya ada di AddressAction supaya bisa diuji.
-        binding.addressBar.onFocusChangeListener = View.OnFocusChangeListener { _, _ ->
+        binding.addressBar.onFocusChangeListener = View.OnFocusChangeListener { _, fokus ->
+            if (fokus) tampilkanChrome()
             perbaruiPanahAlamat()
         }
         binding.addressBar.doAfterTextChanged { perbaruiPanahAlamat() }
@@ -692,9 +728,47 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Bilah status selalu disembunyikan supaya tinggi layar terpakai penuh.
-     * Bilah navigasi dibiarkan terlihat karena itu bawaan ponsel. Digeser dari
-     * tepi atas untuk memunculkan bilah status sementara.
+     * Menyingkirkan bilah alamat ke atas layar, lalu melepasnya dari tata letak
+     * supaya ruangnya dipakai halaman. Pelepasan dilakukan setelah animasi
+     * selesai, karena mengubah tinggi bilah selama animasi memicu perhitungan
+     * ulang kotak virtual di setiap bingkai.
+     */
+    private fun sembunyikanChrome() {
+        if (chromeTersembunyi || customView != null) return
+        val tinggi = binding.chromeBar.height
+        if (tinggi <= 0) return
+
+        tinggiChrome = tinggi
+        chromeTersembunyi = true
+        binding.chromeBar.animate()
+            .translationY(-tinggi.toFloat())
+            .setDuration(SEMBUNYI_DURASI)
+            .withEndAction {
+                // Animasi bisa selesai setelah keadaan berubah lagi, dan
+                // melepas bilah yang seharusnya terlihat akan membuatnya hilang.
+                if (chromeTersembunyi) binding.chromeBar.visibility = View.GONE
+            }
+            .start()
+    }
+
+    private fun tampilkanChrome() {
+        if (!chromeTersembunyi) return
+        chromeTersembunyi = false
+        binding.chromeBar.animate().cancel()
+        binding.chromeBar.visibility = View.VISIBLE
+        val tinggi = if (tinggiChrome > 0) tinggiChrome else binding.chromeBar.height
+        binding.chromeBar.translationY = -tinggi.toFloat()
+        binding.chromeBar.animate()
+            .translationY(0f)
+            .setDuration(TAMPIL_DURASI)
+            .start()
+    }
+
+    /**
+     * Bilah status dan bilah navigasi sistem tetap terlihat, karena itu bukan
+     * bagian aplikasi. Yang menyingkir untuk memberi tinggi adalah bilah alamat,
+     * dan itu diurus sembunyikanChrome. Hanya video fullscreen yang menutupi
+     * keduanya.
      */
     private fun terapkanBilahSistem() {
         val controller = WindowInsetsControllerCompat(window, window.decorView)
@@ -702,11 +776,9 @@ class MainActivity : AppCompatActivity() {
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
         if (customView != null) {
-            // Video fullscreen menutupi seluruh layar, jadi keduanya disembunyikan.
             controller.hide(WindowInsetsCompat.Type.systemBars())
         } else {
-            controller.show(WindowInsetsCompat.Type.navigationBars())
-            controller.hide(WindowInsetsCompat.Type.statusBars())
+            controller.show(WindowInsetsCompat.Type.systemBars())
         }
     }
 
@@ -725,6 +797,9 @@ class MainActivity : AppCompatActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         terapkanBilahSistem()
+        // Perputaran layar mengubah ukuran kotak, dan bilah yang tersembunyi
+        // akan sulit ditemukan kembali di tata letak yang baru.
+        tampilkanChrome()
         binding.viewportContainer.post { applyVirtualScreen() }
     }
 

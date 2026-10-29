@@ -123,8 +123,11 @@ Bilah atas berisi kembali, maju, muat ulang, kotak alamat, dan menu tiga titik. 
   tertulis sebagai judul di menu.
 - **Panah kirim** ada di dalam kotak alamat, di sisi kanan. Muncul saat kotak sedang dipakai, atau saat
   isinya berbeda dari alamat halaman yang terbuka.
-- **Bilah status disembunyikan** supaya halaman dapat tinggi penuh. Geser dari tepi atas layar untuk
-  memunculkannya sementara. Bilah navigasi bawah tetap terlihat.
+- **Bilah alamat menyembunyikan diri.** Saat halaman digulir ke bawah, bilah alamat menyingkir ke atas
+  dan ruangnya dipakai halaman. Menggulir ke atas memunculkannya lagi. Di puncak halaman bilah selalu
+  terlihat, dan selama kolom alamat sedang dipakai bilah tidak pernah menyingkir.
+- **Bilah status dan bilah navigasi sistem** tetap terlihat seperti biasa, karena itu bukan bagian
+  aplikasi. Hanya video fullscreen yang menutupi keduanya.
 - **Bilah progres** berupa garis 2 dp di bawah bilah atas, dan hanya muncul saat halaman dimuat.
 
 ## Memasang pembaruan tanpa menghapus aplikasi
