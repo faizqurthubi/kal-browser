@@ -80,6 +80,18 @@ Simpan berkas `kal-browser.jks` di tempat aman di luar ponsel. Kalau berkas itu 
 
 Workflow `Build APK` berjalan pada setiap push ke branch mana pun dan pada tombol **Run workflow**. Isinya menjalankan unit test, membangun APK debug, lalu mengunggahnya sebagai artifact.
 
+## Memeriksa lebar virtual
+
+Untuk memastikan halaman benar-benar melihat lebar layar virtual, tempel alamat berikut ke kolom
+alamat. Halaman kecil ini menampilkan lebar, tinggi, dan skala yang dilihat situs.
+
+```
+data:text/html,<h1 id=o></h1><script>document.getElementById('o').textContent='lebar '+innerWidth+' tinggi '+innerHeight+' skala '+visualViewport.scale</script>
+```
+
+Angka `lebar` harus sama dengan ukuran yang dipilih di dropdown. Kalau angkanya selebar layar ponsel
+(misalnya 393), berarti ada situs atau WebView yang menolak meta viewport.
+
 ## Batasan
 
 - Mesin render memakai Android System WebView bawaan ponsel. Perbarui **Android System WebView** atau Chrome dari Play Store supaya situs modern tampil benar.

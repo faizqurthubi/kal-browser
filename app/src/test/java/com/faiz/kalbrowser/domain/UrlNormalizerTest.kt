@@ -42,6 +42,24 @@ class UrlNormalizerTest {
     }
 
     @Test
+    fun `halaman uji data url tidak diubah jadi pencarian`() {
+        val halamanUji = "data:text/html,<h1>uji</h1>"
+
+        assertThat(UrlNormalizer.toLoadableUrl(halamanUji)).isEqualTo(halamanUji)
+    }
+
+    @Test
+    fun `about blank diteruskan apa adanya`() {
+        assertThat(UrlNormalizer.toLoadableUrl("about:blank")).isEqualTo("about:blank")
+    }
+
+    @Test
+    fun `host dengan port tetap dianggap alamat`() {
+        assertThat(UrlNormalizer.toLoadableUrl("example.com:8080/uji"))
+            .isEqualTo("https://example.com:8080/uji")
+    }
+
+    @Test
     fun `masukan kosong tidak menghasilkan alamat`() {
         assertThat(UrlNormalizer.toLoadableUrl("   ")).isEmpty()
     }

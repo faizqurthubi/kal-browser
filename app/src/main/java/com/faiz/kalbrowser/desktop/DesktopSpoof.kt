@@ -75,6 +75,11 @@ object DesktopSpoof {
      * Memaksa meta viewport memakai lebar layar virtual, sehingga media query CSS
      * dan satuan vh mengikuti ukuran palsu itu, bukan lebar layar ponsel.
      *
+     * Isinya sengaja hanya `width=W`, tanpa `initial-scale`. Kalau `initial-scale=1`
+     * ikut ditulis, browser memaksa skala 1:1 sehingga halaman selebar 1920 CSS px
+     * hanya terlihat potongan kirinya. Tanpa `initial-scale`, browser menghitung
+     * sendiri skala yang membuat seluruh lebar itu muat di kotak WebView.
+     *
      * Pengamat DOM ikut dipasang karena banyak situs menulis ulang meta viewport
      * setelah halaman dimuat. Tanpa pengamat, nilai yang sudah benar akan ditimpa
      * kembali beberapa ratus milidetik kemudian.
@@ -84,36 +89,57 @@ object DesktopSpoof {
         return """
             (function () {
               var W = $safeWidth;
-              function fix() {
-                try {
-                  var m = document.querySelector('meta[name=viewport]');
-                  if (!m) {
-                    m = document.createElement('meta');
-                    m.name = 'viewport';
-                    (document.head || document.documentElement).appendChild(m);
-                  }
-                  var c = 'width=' + W + ', initial-scale=1';
-                  if (m.content !== c) m.content = c;
-                } catch (e) {}
+              var ISI = 'width=' + W;
+
+              function pasang() {
+                var akar = document.documentElement;
+                if (!akar) return false;
+                var m = document.querySelector('meta[name=viewport]');
+                if (!m) {
+                  m = document.createElement('meta');
+                  m.name = 'viewport';
+                  (document.head || akar).appendChild(m);
+                }
+                if (m.content !== ISI) m.content = ISI;
+                return true;
               }
-              fix();
+
+              // Document-start kadang berjalan sebelum <html> terbentuk. Satu
+              // percobaan gagal berarti halaman terlanjur disusun selebar ponsel,
+              // jadi dicoba berulang selama frame-frame pertama.
+              if (!pasang()) {
+                var coba = 0;
+                var timer = setInterval(function () {
+                  if (pasang() || ++coba > 120) clearInterval(timer);
+                }, 16);
+              }
 
               // Halaman yang terus berubah memicu pengamat ini terus-menerus.
               // Pekerjaannya dijadwalkan sekali per putaran, bukan setiap mutasi.
-              var scheduled = false;
-              function schedule() {
-                if (scheduled) return;
-                scheduled = true;
-                setTimeout(function () { scheduled = false; fix(); }, 0);
+              var terjadwal = false;
+              function jadwalkan() {
+                if (terjadwal) return;
+                terjadwal = true;
+                setTimeout(function () { terjadwal = false; pasang(); }, 0);
               }
-              try {
-                new MutationObserver(schedule).observe(document.documentElement, {
-                  childList: true,
-                  subtree: true,
-                  attributes: true,
-                  attributeFilter: ['content']
-                });
-              } catch (e) {}
+              function amati() {
+                try {
+                  if (!document.documentElement) return false;
+                  new MutationObserver(jadwalkan).observe(document.documentElement, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ['content']
+                  });
+                  return true;
+                } catch (e) {
+                  return false;
+                }
+              }
+              if (!amati()) {
+                document.addEventListener('DOMContentLoaded', amati);
+                document.addEventListener('readystatechange', amati);
+              }
             })();
         """.trimIndent()
     }

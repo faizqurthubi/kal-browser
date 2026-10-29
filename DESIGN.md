@@ -140,6 +140,20 @@ Diambil dari panduan, bukan dikarang di sini:
 
 Nama tampilan dan nama paket mengikuti nama repo Kal Browser. Panduan menetapkan nama Desktop Browser dan paket `com.faiz.desktopbrowser`, tapi juga membolehkan paket diganti bila pemilik meminta, dan pemilik meminta namanya Kal Browser.
 
-## 10. Yang tidak dijanjikan
+## 10. Konflik panduan yang sudah diputuskan
+
+Panduan 6.4 memberi contoh meta viewport `content="width=VW, initial-scale=1"`. Contoh itu bertentangan
+dengan panduan 6.3, yang mewajibkan halaman mengecil agar muat di dalam kotak.
+
+Sebabnya, `initial-scale` menetapkan skala 1:1, dan menurut spesifikasi, begitu skala awal ditetapkan,
+`width` berubah arti menjadi lebar minimum. Halaman selebar 1920 CSS px lalu disusun pada skala 1 dan
+hanya terlihat potongan kirinya di kotak yang lebarnya 700-an px. Gejalanya persis seperti tangkapan
+layar pemilik: logo besar, navigasi menempel di tepi, gambar terpotong.
+
+Keputusan: `initial-scale` dibuang, meta menjadi `width=W` saja. Tanpa `initial-scale`, browser
+menghitung sendiri skala yang membuat seluruh lebar muat. Ini juga yang dianjurkan dokumentasi MDN
+untuk halaman dengan viewport lebar. Syarat panduan 6.3 menang atas contoh kode di panduan 6.4.
+
+## 11. Yang tidak dijanjikan
 
 Aplikasi ini tidak menampilkan klaim apa pun tentang seberapa besar kemungkinan sebuah situs mendeteksi mode desktop. Panduan bagian 12 menyebut bahwa sebagian situs tetap bisa mendeteksi WebView lewat sinyal lain. Karena itu tidak ada label "anti deteksi", tidak ada persentase keberhasilan, dan tidak ada daftar situs yang "didukung". Yang bisa dibuktikan hanya perilaku aplikasi, dan itu yang ditampilkan.

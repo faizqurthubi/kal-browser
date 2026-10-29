@@ -8,7 +8,9 @@ import java.net.URLEncoder
  */
 object UrlNormalizer {
 
-    private val KNOWN_SCHEMES = setOf("http", "https", "file", "about")
+    // data: dan about: ikut diterima karena berguna untuk menempel halaman uji
+    // kecil langsung dari kolom alamat, tanpa perlu situs.
+    private val KNOWN_SCHEMES = setOf("http", "https", "file", "about", "data")
 
     fun toLoadableUrl(input: String): String {
         val trimmed = input.trim()
@@ -16,8 +18,10 @@ object UrlNormalizer {
 
         // Skema diperiksa lebih dulu dari aturan titik, karena alamat seperti
         // http://localhost tidak punya titik dan bukan berarti kata kunci pencarian.
-        val scheme = trimmed.substringBefore("://", missingDelimiterValue = "").lowercase()
-        if (scheme in KNOWN_SCHEMES) return trimmed
+        // data: dan about: tidak memakai "://", jadi yang diperiksa bagian
+        // sebelum titik dua pertama.
+        val scheme = trimmed.substringBefore(':').lowercase()
+        if (trimmed.contains(':') && scheme in KNOWN_SCHEMES) return trimmed
 
         // Aturan panduan 6.6: spasi atau tanpa titik berarti pencarian.
         val looksLikeHost = !trimmed.contains(' ') && trimmed.contains('.')

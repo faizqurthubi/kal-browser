@@ -63,7 +63,31 @@ class DesktopSpoofTest {
         val script = DesktopSpoof.viewportScript(1280)
 
         assertThat(script).contains("var W = 1280;")
-        assertThat(script).contains("'width=' + W + ', initial-scale=1'")
+        assertThat(script).contains("'width=' + W")
+    }
+
+    @Test
+    fun `meta viewport tidak memaksa skala satu banding satu`() {
+        // initial-scale=1 membuat halaman selebar 1920 hanya terlihat potongan
+        // kirinya, karena skala tidak pernah dikecilkan agar muat di kotak.
+        assertThat(DesktopSpoof.viewportScript(1920)).doesNotContain("initial-scale")
+    }
+
+    @Test
+    fun `script viewport mencoba ulang kalau html belum terbentuk`() {
+        val script = DesktopSpoof.viewportScript(1024)
+
+        assertThat(script).contains("if (!pasang())")
+        assertThat(script).contains("setInterval")
+        assertThat(script).contains("clearInterval")
+    }
+
+    @Test
+    fun `pengamat dipasang setelah html ada`() {
+        val script = DesktopSpoof.viewportScript(1024)
+
+        assertThat(script).contains("function amati()")
+        assertThat(script).contains("DOMContentLoaded")
     }
 
     @Test
@@ -76,7 +100,7 @@ class DesktopSpoofTest {
     fun `script viewport mengamati perubahan dom`() {
         val script = DesktopSpoof.viewportScript(1024)
 
-        assertThat(script).contains("new MutationObserver(schedule)")
+        assertThat(script).contains("new MutationObserver(jadwalkan)")
         assertThat(script).contains("attributeFilter: ['content']")
     }
 
