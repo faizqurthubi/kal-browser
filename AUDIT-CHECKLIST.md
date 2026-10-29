@@ -15,8 +15,8 @@ Tiga status dipakai, dan bedanya sengaja dijaga:
 |---|---|---|---|
 | 1 | Workflow jalan pada tag `v*` dan melampirkan APK ke Release | LULUS | 10 tag rilis, semuanya sukses, unduhan publik tanpa login menjawab HTTP 200 |
 | 2 | Aplikasi terbuka, address bar memuat URL dan pencarian | LULUS | Pemilik menguji pencarian tanpa titik dan hasilnya terbuka |
-| 3 | Situs dengan tata letak mobile dan desktop menampilkan desktop | LULUS untuk satu situs | `tbkholding.co.id/id` dipastikan pemilik berubah dari tata letak mobile ke desktop pada 1920 |
-| 4 | Situs pendeteksi melaporkan Windows dan Chrome, `userAgentData.mobile` false | SEBAGIAN | `mobile menurut hint` sudah `false` dan `platform` Win32, tapi `ontouchstart` masih `true` pada v1.9.0. Perbaikan sedang diuji pada v1.9.1 |
+| 3 | Situs dengan tata letak mobile dan desktop menampilkan desktop | SEBAGIAN | `tbkholding.co.id/id` terbukti berubah ke tata letak desktop. Pada situs kedua, halaman sudah dilihat sebagai 1280 × 720 dengan user agent Windows, tapi tangkapan layar tata letaknya belum dikirim |
+| 4 | Situs pendeteksi melaporkan Windows dan Chrome, `userAgentData.mobile` false | LULUS | `kal:info` pada v1.9.1 di `whatismybrowser.com`: `platform` Win32, `titik sentuh` 0, `mobile menurut hint` false, `ontouchstart` false, `typeof ontouchstart` undefined, dan user agent Windows NT 10.0 Chrome 156 |
 | 5 | Mengganti ukuran mengubah lebar CSS yang dilihat halaman | LULUS | Pemilik memastikan `kal:info` pada 1920 × 1080 melaporkan lebar dan tinggi sesuai |
 | 6 | Tombol tukar menukar W dan H, rasio berubah, tanpa stretch, sisa hitam | LULUS | Pemilik memastikan `1080 × 1920` berhasil dan kotak tetap bertepi hitam |
 | 7 | `100vh` sesuai tinggi virtual | LULUS | `tinggi halaman` pada `kal:info` sesuai tinggi virtual |
@@ -28,7 +28,7 @@ Tiga status dipakai, dan bedanya sengaja dijaga:
 | 13 | Ukuran dan orientasi tersimpan setelah aplikasi ditutup | LULUS | Pemilik memastikan `1080 × 1920` bertahan setelah ditutup |
 | 14 | Tidak ada crash saat fitur WebView tidak didukung | LULUS | Setiap `WebViewFeature` diperiksa dulu sebelum dipakai, di dua tempat |
 
-Ringkasan: 12 lulus, 1 sebagian, 1 belum diuji, 0 gagal.
+Ringkasan: 13 lulus, 1 sebagian, 0 belum diuji, 0 gagal.
 
 ## Delivery Gate
 
@@ -68,7 +68,18 @@ Dial dan penguncian konsistensi tidak punya objek di aplikasi ini. Yang bisa dip
 
 ## Yang dibutuhkan dari pemilik
 
-Dua butir masih terbuka:
+Satu butir tersisa: tangkapan layar `whatismybrowser.com` setelah kotak `kal:info` ditutup, untuk memastikan tata letaknya desktop dan bukan tata letak ponsel. Angkanya sudah membuktikan halaman melihat layar 1280 × 720 dengan user agent Windows, jadi yang belum terlihat hanya bentuk tata letaknya.
 
-1. Butir 3 untuk situs kedua: buka `https://www.whatismybrowser.com`, pastikan tata letaknya desktop, bukan tata letak ponsel.
-2. Butir 4: pada v1.9.0, `ontouchstart` masih `true`. Perbaikannya ada di v1.9.1, dan perlu dipastikan ulang lewat `kal:info`.
+Angka lengkap dari `kal:info` pada `1280 × 720`, situs `whatismybrowser.com`:
+
+```
+lebar halaman: 1280 px        skala tampilan: 0.307
+tinggi halaman: 720 px        lebar visual: 1280 px
+lebar dokumen: 1280 px        meta viewport: "width=1280" lalu "width=1280"
+beda: 0 px                    elemen terlebar: tidak ada
+geser horizontal: 0 px        platform: Win32
+titik sentuh: 0               mobile menurut hint: false
+ontouchstart: false           typeof ontouchstart: undefined
+```
+
+`beda: 0` dan `elemen terlebar: tidak ada` sekaligus membuktikan halaman ini tidak bisa digeser ke samping pada 1280.
