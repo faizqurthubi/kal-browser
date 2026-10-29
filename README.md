@@ -157,6 +157,7 @@ Pada HP dengan layar 393 dp, batasnya jatuh di antara 1366 dan 1440 pada dropdow
 
 - Mesin render memakai Android System WebView bawaan ponsel. Perbarui **Android System WebView** atau Chrome dari Play Store supaya situs modern tampil benar.
 - Sebagian situs tetap bisa mendeteksi bahwa halaman dibuka di WebView walaupun User-Agent sudah dipalsukan. Itu batas mesin render, bukan kesalahan aplikasi.
+- Yang disamarkan: user agent, platform, jumlah titik sentuh, ciri mobile pada Client Hints, dan properti sentuh. Yang belum: GPU lewat WebGL, ukuran layar fisik, dan jumlah inti prosesor. Situs yang memeriksa ketiganya masih bisa menyimpulkan ini perangkat Android. Bukti dan angkanya ada di `AUDIT-CHECKLIST.md`.
 - Ukuran layar dan orientasi virtual tersimpan, tapi alamat terakhir sengaja tidak. Aplikasi selalu
   dibuka dalam keadaan kosong, karena langsung memuat halaman lama terasa seperti aplikasi yang tidak
   pernah benar-benar ditutup.

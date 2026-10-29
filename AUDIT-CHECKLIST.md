@@ -15,7 +15,7 @@ Tiga status dipakai, dan bedanya sengaja dijaga:
 |---|---|---|---|
 | 1 | Workflow jalan pada tag `v*` dan melampirkan APK ke Release | LULUS | 10 tag rilis, semuanya sukses, unduhan publik tanpa login menjawab HTTP 200 |
 | 2 | Aplikasi terbuka, address bar memuat URL dan pencarian | LULUS | Pemilik menguji pencarian tanpa titik dan hasilnya terbuka |
-| 3 | Situs dengan tata letak mobile dan desktop menampilkan desktop | SEBAGIAN | `tbkholding.co.id/id` terbukti berubah ke tata letak desktop. Pada situs kedua, halaman sudah dilihat sebagai 1280 × 720 dengan user agent Windows, tapi tangkapan layar tata letaknya belum dikirim |
+| 3 | Situs dengan tata letak mobile dan desktop menampilkan desktop | LULUS | `tbkholding.co.id/id` berubah ke tata letak desktop pada 1920. Laporan `whatismybrowser.com/w/BJYLG28` menyebut Chrome 156 di Windows 10 dan Hardware Type Computer, dan tangkapan layar pemilik menunjukkan tata letak desktop penuh |
 | 4 | Situs pendeteksi melaporkan Windows dan Chrome, `userAgentData.mobile` false | LULUS | `kal:info` pada v1.9.1 di `whatismybrowser.com`: `platform` Win32, `titik sentuh` 0, `mobile menurut hint` false, `ontouchstart` false, `typeof ontouchstart` undefined, dan user agent Windows NT 10.0 Chrome 156 |
 | 5 | Mengganti ukuran mengubah lebar CSS yang dilihat halaman | LULUS | Pemilik memastikan `kal:info` pada 1920 × 1080 melaporkan lebar dan tinggi sesuai |
 | 6 | Tombol tukar menukar W dan H, rasio berubah, tanpa stretch, sisa hitam | LULUS | Pemilik memastikan `1080 × 1920` berhasil dan kotak tetap bertepi hitam |
@@ -28,7 +28,7 @@ Tiga status dipakai, dan bedanya sengaja dijaga:
 | 13 | Ukuran dan orientasi tersimpan setelah aplikasi ditutup | LULUS | Pemilik memastikan `1080 × 1920` bertahan setelah ditutup |
 | 14 | Tidak ada crash saat fitur WebView tidak didukung | LULUS | Setiap `WebViewFeature` diperiksa dulu sebelum dipakai, di dua tempat |
 
-Ringkasan: 13 lulus, 1 sebagian, 0 belum diuji, 0 gagal.
+Ringkasan akhir: 14 lulus, 0 sebagian, 0 belum diuji, 0 gagal.
 
 ## Delivery Gate
 
@@ -66,9 +66,22 @@ Laporan per blok, dengan bukti.
 
 Dial dan penguncian konsistensi tidak punya objek di aplikasi ini. Yang bisa diperiksa, konsistensi, sudah: satu warna aksen dipakai di satu tempat, satu keluarga tipografi, dan tidak ada dua gaya untuk hal yang sama.
 
-## Yang dibutuhkan dari pemilik
+## Bukti dari laporan pihak ketiga
 
-Satu butir tersisa: tangkapan layar `whatismybrowser.com` setelah kotak `kal:info` ditutup, untuk memastikan tata letaknya desktop dan bukan tata letak ponsel. Angkanya sudah membuktikan halaman melihat layar 1280 × 720 dengan user agent Windows, jadi yang belum terlihat hanya bentuk tata letaknya.
+Laporan `whatismybrowser.com/w/BJYLG28` pada 1920 × 1080 mencatat:
+
+| Yang diperiksa | Hasil |
+|---|---|
+| Browser | Chrome 156 di Windows 10 |
+| Hardware Type | Computer |
+| Navigator Platform | Win32 |
+| Maximum Touch Points | 0 |
+| JavaScript dan cookie | aktif, termasuk cookie pihak ketiga |
+| User agent | Windows NT 10.0, Win64, Chrome 156 |
+
+Tiga yang pertama adalah tiga sinyal yang paling sering dipakai situs untuk memilih tata letak, dan ketiganya sudah desktop.
+
+Laporan yang sama juga membocorkan hal yang tidak disamarkan, dan itu perlu dicatat dengan jujur: WebGL renderer `Adreno 618`, ukuran layar fisik `786 x 1746`, dan IP di Jakarta. Situs yang memeriksa GPU atau ukuran layar fisik masih bisa menyimpulkan ini perangkat Android. Menyamarkan WebGL bisa dilakukan, tapi berisiko merusak situs peta dan 3D, jadi belum dipakai.
 
 Angka lengkap dari `kal:info` pada `1280 × 720`, situs `whatismybrowser.com`:
 
