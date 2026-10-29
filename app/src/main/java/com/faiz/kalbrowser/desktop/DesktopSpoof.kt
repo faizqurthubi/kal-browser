@@ -153,7 +153,8 @@ object DesktopSpoof {
     /**
      * Membaca angka yang benar-benar dilihat halaman saat ini, lalu menyusunnya
      * sebagai teks biasa. Dipakai untuk memeriksa apakah lebar virtual benar
-     * sampai ke halaman, tanpa perlu komputer atau DevTools.
+     * sampai ke halaman, dan untuk membedakan halaman yang memang bisa digeser
+     * ke samping dari halaman yang tata letaknya rusak.
      */
     fun diagnosticsScript(): String = """
         (function () {
@@ -164,14 +165,46 @@ object DesktopSpoof {
               meta.push('"' + daftar[i].content + '"');
             }
             var vv = window.visualViewport;
+            var akar = document.documentElement;
+            var lebarHalaman = window.innerWidth;
+            var lebarDokumen = akar ? akar.scrollWidth : 0;
+
+            // Elemen yang lebih lebar dari layar adalah tersangka utama kalau
+            // seluruh halaman bisa digeser ke samping.
+            var terlebar = null;
+            var semua = document.querySelectorAll('body *');
+            var batas = Math.min(semua.length, 4000);
+            for (var j = 0; j < batas; j++) {
+              var el = semua[j];
+              var w = el.scrollWidth;
+              if (w > lebarHalaman + 1 && (!terlebar || w > terlebar.w)) {
+                terlebar = { w: w, el: el };
+              }
+            }
+
+            var nama = 'tidak ada';
+            if (terlebar) {
+              var el = terlebar.el;
+              nama = el.tagName.toLowerCase();
+              if (el.id) nama += '#' + el.id;
+              if (el.className && typeof el.className === 'string') {
+                nama += '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.');
+              }
+              nama += ' (' + terlebar.w + ' px)';
+            }
+
             var baris = [
-              'lebar halaman: ' + window.innerWidth + ' px',
+              'lebar halaman: ' + lebarHalaman + ' px',
               'tinggi halaman: ' + window.innerHeight + ' px',
+              'lebar dokumen: ' + lebarDokumen + ' px',
+              'beda: ' + (lebarDokumen - lebarHalaman) + ' px',
+              'geser horizontal: ' + Math.round(window.scrollX || 0) + ' px',
               'skala tampilan: ' + (vv ? vv.scale.toFixed(3) : 'tidak tersedia'),
               'lebar visual: ' + (vv ? Math.round(vv.width) + ' px' : 'tidak tersedia'),
               'rasio piksel: ' + window.devicePixelRatio,
               'layar fisik: ' + screen.width + ' x ' + screen.height,
               'meta viewport: ' + (meta.length ? meta.join(' lalu ') : 'tidak ada'),
+              'elemen terlebar: ' + nama,
               'platform: ' + navigator.platform,
               'titik sentuh: ' + navigator.maxTouchPoints
             ];

@@ -112,6 +112,22 @@ class DesktopSpoofTest {
     }
 
     @Test
+    fun `script periksa membedakan halaman bergeser dari tata letak rusak`() {
+        val script = DesktopSpoof.diagnosticsScript()
+
+        assertThat(script).contains("lebar dokumen")
+        assertThat(script).contains("geser horizontal")
+        assertThat(script).contains("elemen terlebar")
+    }
+
+    @Test
+    fun `pencarian elemen terlebar dibatasi supaya halaman besar tidak membeku`() {
+        val script = DesktopSpoof.diagnosticsScript()
+
+        assertThat(script).contains("Math.min(semua.length, 4000)")
+    }
+
+    @Test
     fun `pengamat dipasang setelah html ada`() {
         val script = DesktopSpoof.viewportScript(1024)
 

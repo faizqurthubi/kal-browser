@@ -85,8 +85,15 @@ Workflow `Build APK` berjalan pada setiap push ke branch mana pun dan pada tombo
 Kalau sebuah situs masih tampil dengan tata letak mobile, ada dua cara memeriksanya.
 
 Cara pertama, tempel `kal:info` ke kolom alamat. Muncul kotak berisi angka yang benar-benar dilihat
-halaman, termasuk `lebar halaman`. Angka itu harus sama dengan ukuran yang dipilih di dropdown. Kalau
-angkanya selebar layar ponsel, berarti situs menolak lebar virtual.
+halaman. Yang perlu dibaca:
+
+- `lebar halaman` harus sama dengan ukuran yang dipilih di dropdown. Kalau angkanya selebar layar
+  ponsel, berarti ada yang menolak lebar virtual.
+- `beda` adalah selisih antara lebar dokumen dan lebar halaman. Kalau angkanya 0, seluruh halaman pas
+  di layar dan tidak bisa digeser ke samping. Kalau lebih dari 0, ada bagian yang lebih lebar dari
+  layar, dan baris `elemen terlebar` menyebut elemen mana.
+- `geser horizontal` menunjukkan seberapa jauh halaman sudah digeser. Halaman yang tidak bisa digeser
+  ke samping selalu menampilkan 0.
 
 Cara kedua, tempel alamat berikut untuk halaman uji kecil:
 
