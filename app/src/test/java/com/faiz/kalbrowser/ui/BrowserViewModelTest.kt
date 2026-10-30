@@ -78,22 +78,22 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun `memilih preset mengubah lebar dan meminta pasang viewport`() = runTest {
+    fun `memilih ukuran mengubah lebar dan meminta pasang viewport`() = runTest {
         val viewModel = BrowserViewModel(FakeSettingsRepository())
 
-        viewModel.selectPreset(4)
+        viewModel.selectSize(4, portrait = false)
 
         assertThat(viewModel.uiState.value.viewportWidth).isEqualTo(1920)
         assertThat(viewModel.commands.first()).isEqualTo(BrowserCommand.ApplyViewport(1920))
     }
 
     @Test
-    fun `preset yang sama tidak memicu perintah lagi`() = runTest {
+    fun `kartu yang sama tidak memicu perintah lagi`() = runTest {
         val viewModel = BrowserViewModel(FakeSettingsRepository())
-        viewModel.selectPreset(2)
+        viewModel.selectSize(2, portrait = false)
         assertThat(viewModel.commands.first()).isEqualTo(BrowserCommand.ApplyViewport(1366))
 
-        viewModel.selectPreset(2)
+        viewModel.selectSize(2, portrait = false)
 
         // Tidak ada perintah kedua yang menunggu, jadi uji ini hanya memastikan
         // state tetap dan tidak ada muat ulang tambahan yang dikirim.
@@ -104,18 +104,18 @@ class BrowserViewModelTest {
     fun `indeks preset di luar rentang diabaikan`() {
         val viewModel = BrowserViewModel(FakeSettingsRepository())
 
-        viewModel.selectPreset(99)
-        viewModel.selectPreset(-1)
+        viewModel.selectSize(99, portrait = false)
+        viewModel.selectSize(-1, portrait = true)
 
         assertThat(viewModel.uiState.value.selectedPresetIndex)
             .isEqualTo(BrowserUiState.DEFAULT_PRESET_INDEX)
     }
 
     @Test
-    fun `rotate menukar lebar dan tinggi`() = runTest {
+    fun `kartu tegak menukar lebar dan tinggi`() = runTest {
         val viewModel = BrowserViewModel(FakeSettingsRepository())
 
-        viewModel.rotate()
+        viewModel.selectSize(BrowserUiState.DEFAULT_PRESET_INDEX, portrait = true)
 
         val state = viewModel.uiState.value
         assertThat(state.viewportWidth).isEqualTo(720)
@@ -125,21 +125,21 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun `rotate dua kali kembali ke ukuran semula`() {
+    fun `memilih mendatar lagi mengembalikan ukuran semula`() {
         val viewModel = BrowserViewModel(FakeSettingsRepository())
+        val awal = BrowserUiState.DEFAULT_PRESET_INDEX
 
-        viewModel.rotate()
-        viewModel.rotate()
+        viewModel.selectSize(awal, portrait = true)
+        viewModel.selectSize(awal, portrait = false)
 
         assertThat(viewModel.uiState.value.viewportWidth).isEqualTo(1280)
     }
 
     @Test
-    fun `preset dan orientasi digabung dengan benar`() {
+    fun `kartu menentukan preset dan orientasi sekaligus`() {
         val viewModel = BrowserViewModel(FakeSettingsRepository())
 
-        viewModel.selectPreset(4)
-        viewModel.rotate()
+        viewModel.selectSize(4, portrait = true)
 
         assertThat(viewModel.uiState.value.effectiveSizeLabel).isEqualTo("1080 × 1920")
     }
@@ -178,18 +178,18 @@ class BrowserViewModelTest {
         val settings = FakeSettingsRepository()
 
         val viewModel = BrowserViewModel(settings)
-        viewModel.selectPreset(3)
+        viewModel.selectSize(3, portrait = false)
 
         assertThat(settings.isiTersimpan().presetIndex).isEqualTo(3)
         assertThat(settings.jumlahSimpan).isEqualTo(1)
     }
 
     @Test
-    fun `menukar orientasi menyimpan pilihan`() {
+    fun `memilih kartu tegak menyimpan orientasi`() {
         val settings = FakeSettingsRepository()
 
         val viewModel = BrowserViewModel(settings)
-        viewModel.rotate()
+        viewModel.selectSize(BrowserUiState.DEFAULT_PRESET_INDEX, portrait = true)
 
         assertThat(settings.isiTersimpan().isPortrait).isTrue()
     }
@@ -210,8 +210,25 @@ class BrowserViewModelTest {
         val settings = FakeSettingsRepository()
 
         val viewModel = BrowserViewModel(settings)
-        viewModel.selectPreset(viewModel.uiState.value.selectedPresetIndex)
+        val state = viewModel.uiState.value
+        viewModel.selectSize(state.selectedPresetIndex, state.isPortrait)
 
         assertThat(settings.jumlahSimpan).isEqualTo(0)
+    }
+
+    @Test
+    fun `preset sama dengan orientasi berbeda tetap dihitung perubahan`() = runTest {
+        val settings = FakeSettingsRepository()
+
+        val viewModel = BrowserViewModel(settings)
+        val state = viewModel.uiState.value
+        viewModel.selectSize(state.selectedPresetIndex, portrait = !state.isPortrait)
+
+        // Kartu mendatar dan kartu tegak adalah dua kartu berbeda, jadi menukar
+        // di antaranya harus mengirim perintah dan menyimpan pilihan.
+        assertThat(settings.jumlahSimpan).isEqualTo(1)
+        assertThat(viewModel.uiState.value.isPortrait).isEqualTo(!state.isPortrait)
+        assertThat(viewModel.commands.first())
+            .isEqualTo(BrowserCommand.ApplyViewport(viewModel.uiState.value.viewportWidth))
     }
 }

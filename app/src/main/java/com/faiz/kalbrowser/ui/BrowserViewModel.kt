@@ -64,18 +64,18 @@ class BrowserViewModel(
         _commands.trySend(command)
     }
 
-    fun selectPreset(index: Int) {
+    /**
+     * Memilih ukuran dan orientasi sekaligus. Sidebar menampilkan sepuluh kartu,
+     * jadi memilih kartu berarti menentukan keduanya dalam satu ketukan. Kalau
+     * orientasi diubah lewat jalur terpisah, kartu yang ditandai bisa berbeda
+     * dari ukuran yang benar-benar dipakai halaman.
+     */
+    fun selectSize(index: Int, portrait: Boolean) {
         if (index !in PRESETS.indices) return
-        if (index == _uiState.value.selectedPresetIndex) return
+        val state = _uiState.value
+        if (index == state.selectedPresetIndex && portrait == state.isPortrait) return
 
-        _uiState.update { it.copy(selectedPresetIndex = index) }
-        simpanPengaturan()
-        _commands.trySend(BrowserCommand.ApplyViewport(_uiState.value.viewportWidth))
-    }
-
-    /** Menukar lebar dan tinggi virtual tanpa memutar layar fisik. */
-    fun rotate() {
-        _uiState.update { it.copy(isPortrait = !it.isPortrait) }
+        _uiState.update { it.copy(selectedPresetIndex = index, isPortrait = portrait) }
         simpanPengaturan()
         _commands.trySend(BrowserCommand.ApplyViewport(_uiState.value.viewportWidth))
     }

@@ -9,4 +9,14 @@
     <dimen name="field_radius">4dp</dimen>
     <dimen name="field_padding">8dp</dimen>
     <dimen name="field_height">36dp</dimen>
+    <dimen name="sidebar_width">284dp</dimen>
+    <dimen name="size_card_longest">48dp</dimen>
+    <dimen name="size_cell_width">63dp</dimen>
+    <!-- Tinggi sel = kartu tertinggi 48 dp + ruang label 16 dp. -->
+    <dimen name="size_cell_height">64dp</dimen>
+    <!-- Jarak judul bagian ke kisinya kecil, karena keduanya satu kelompok.
+         Jarak antarbagian besar, karena keduanya kelompok yang berbeda. -->
+    <dimen name="size_label_gap">4dp</dimen>
+    <dimen name="size_section_gap">24dp</dimen>
+    <dimen name="size_heading_gap">8dp</dimen>
 </resources>

@@ -84,14 +84,15 @@ Workflow `Build APK` berjalan pada setiap push ke branch mana pun dan pada tombo
 
 Kalau sebuah situs masih tampil dengan tata letak mobile, ada dua cara memeriksanya.
 
-Buka menu tiga titik di kanan atas, lalu pilih **Info halaman**. Muncul kotak berisi angka yang
-benar-benar dilihat halaman, dan tombol **Salin** untuk memindahkannya ke papan klip.
+Buka sidebar lewat ikon garis tiga di ujung kanan bilah, lalu ketuk **Info halaman** di dasarnya.
+Muncul kotak berisi angka yang benar-benar dilihat halaman, dan tombol **Salin** untuk memindahkannya
+ke papan klip.
 
 `kal:info` yang ditempel ke kolom alamat juga masih jalan, dan hasilnya sama.
 
 Yang perlu dibaca:
 
-- `lebar halaman` harus sama dengan ukuran yang dipilih di dropdown. Kalau angkanya selebar layar
+- `lebar halaman` harus sama dengan ukuran yang dipilih di sidebar. Kalau angkanya selebar layar
   ponsel, berarti ada yang menolak lebar virtual.
 - `beda` adalah selisih antara lebar dokumen dan lebar halaman. Kalau angkanya 0, seluruh halaman pas
   di layar dan tidak bisa digeser ke samping. Kalau lebih dari 0, ada bagian yang lebih lebar dari
@@ -112,7 +113,7 @@ alamat. Halaman kecil ini menampilkan lebar, tinggi, dan skala yang dilihat situ
 data:text/html,<h1 id=o></h1><script>document.getElementById('o').textContent='lebar '+innerWidth+' tinggi '+innerHeight+' skala '+visualViewport.scale</script>
 ```
 
-Angka `lebar` harus sama dengan ukuran yang dipilih di dropdown. Kalau angkanya selebar layar ponsel
+Angka `lebar` harus sama dengan ukuran yang dipilih di sidebar. Kalau angkanya selebar layar ponsel
 (misalnya 393), berarti ada situs atau WebView yang menolak meta viewport.
 
 ## Ikon
@@ -124,10 +125,16 @@ lima kerapatan untuk Android 7.
 
 ## Bentuk chrome
 
-Bilah atas berisi kembali, maju, muat ulang, kotak alamat, dan menu tiga titik. Satu bilah, 48 dp.
+Bilah atas berisi kembali, maju, muat ulang, kotak alamat, dan ikon garis tiga di ujung kanan. Satu
+bilah, 48 dp. Ikon itu menempati tempat menu titik tiga yang digantikannya.
 
-- **Ukuran layar dan tukar orientasi** ada di dalam menu. Ukuran aktif ditandai centang, dan nilainya
-  tertulis sebagai judul di menu.
+- **Ukuran layar ada di sidebar.** Ikon garis tiga membuka panel dari kanan berisi dua bagian, Landscape
+  dan Portrait. Tiap bagian berupa kisi empat kolom dua baris dengan sel yang sama besar. Lima sel
+  terisi dan tiga sel sengaja dikosongkan. Di dasar tiap sel ada teks ukurannya, dan sisa ruang di
+  atasnya dipakai kotak yang bentuknya mengikuti rasio ukuran, diletakkan di tengah. Semua kartu
+  memakai satu skala, jadi kartu 1920 tampil lebih besar daripada kartu 1024. Memilih kartu langsung
+  memakai ukuran itu, dan sidebar menutup supaya hasilnya terlihat. Ukuran aktif ditandai garis di tepi
+  kartunya dan labelnya dicetak lebih tegas.
 - **Panah kirim** ada di dalam kotak alamat, di sisi kanan. Muncul saat kotak sedang dipakai, atau saat
   isinya berbeda dari alamat halaman yang terbuka.
 - **Bilah alamat menyembunyikan diri.** Saat halaman digulir ke bawah, bilah alamat menyingkir ke atas
@@ -177,7 +184,7 @@ Untuk ukuran seperti itu, WebView diletakkan seukuran layar virtual lalu diperke
 View, yang tidak punya batas 25%. Ukuran yang masih sanggup ditangani WebView sendiri tetap memakai
 jalur biasa, karena hasil teksnya lebih tajam. Peralihan ini otomatis.
 
-Pada HP dengan layar 393 dp, batasnya jatuh di antara 1366 dan 1440 pada dropdown ukuran.
+Pada HP dengan layar 393 dp, batasnya jatuh di antara 1366 dan 1440 pada daftar ukuran.
 
 ## Batasan
 

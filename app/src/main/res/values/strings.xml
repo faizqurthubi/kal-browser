@@ -22,11 +22,13 @@
     <string name="upload_unavailable">Tidak ada aplikasi pemilih berkas</string>
 
     <string name="action_go">Buka alamat</string>
-    <string name="action_menu">Menu</string>
-    <string name="menu_screen_size">Ukuran layar</string>
-    <string name="menu_rotate">Tukar lebar dan tinggi</string>
-    <string name="menu_diagnostics">Info halaman</string>
     <string name="action_copy">Salin</string>
     <string name="diagnostics_copied">Info halaman tersalin</string>
     <string name="diagnostics_copy_failed">Info halaman tidak bisa disalin</string>
+
+    <string name="action_sidebar">Menu ukuran dan info</string>
+    <string name="sidebar_sizes">Ukuran layar</string>
+    <string name="sidebar_landscape">Landscape</string>
+    <string name="sidebar_portrait">Portrait</string>
+    <string name="sidebar_diagnostics">Info halaman</string>
 </resources>

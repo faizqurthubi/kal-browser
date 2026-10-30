@@ -87,8 +87,8 @@ Dua baris di atas, tidak ada apa pun di bawah. Susunan ini mengikuti panduan bag
 - Tombol muat ulang berubah menjadi tombol hentikan selama halaman dimuat. Satu tombol, dua keadaan, karena keduanya tidak pernah dibutuhkan bersamaan.
 - Dropdown berisi lima ukuran dari panduan. Baris yang dipilih dan baris di dalam daftar memakai
   tata letak yang sama, supaya angka yang dibaca sebelum memilih sama persis dengan yang dibaca
-  setelahnya.
-- Label ukuran menunjukkan ukuran efektif setelah orientasi virtual diterapkan. Saat belum diputar angkanya sama dengan isi dropdown. Saat diputar, label menjadi satu-satunya tempat yang menunjukkan bahwa lebar dan tinggi sudah bertukar.
+  setelahnya. Dropdown ini diganti sidebar di versi 1.10.4, lihat bagian 19.
+- Label ukuran menunjukkan ukuran efektif setelah orientasi virtual diterapkan. Saat belum diputar angkanya sama dengan isi dropdown. Saat diputar, label menjadi satu-satunya tempat yang menunjukkan bahwa lebar dan tinggi sudah bertukar. Sejak versi 1.10.4 tidak ada lagi tombol tukar, karena sisi tegak dipilih langsung dari kartunya.
 - Tombol Buka memakai tinta biasa, bukan warna aksen. Menekan tombol itu tidak lebih penting daripada menekan tombol Go di papan ketik, jadi memberinya aksen akan memindahkan fokus dari halaman web.
 - Tidak ada bilah alamat bawah, tidak ada tombol berbagi, tidak ada bookmark, tidak ada tab, tidak ada menu tiga titik. Yang tidak ada di panduan tidak dibuat.
 - Tidak ada bayangan. Dua garis pemisah 1dp sudah memisahkan chrome dari halaman, dan bayangan akan terlihat seperti bagian dari halaman.
@@ -194,7 +194,8 @@ Konflik ini disampaikan lebih dulu, dan permintaan pemilik yang dipakai.
 Yang berubah dan alasannya:
 
 - **Baris kedua dihapus, isinya masuk menu kebab.** Baris itu setinggi 48 dp dan hanya berisi pilihan
-  yang dipakai sekali di awal sesi. Memindahkannya ke menu memberi 48 dp untuk halaman.
+  yang dipakai sekali di awal sesi. Memindahkannya ke menu memberi 48 dp untuk halaman. Menu kebab itu
+  sendiri diganti sidebar di versi 1.10.4, lihat bagian 19.
 - **Tombol Buka diganti panah di dalam kotak alamat.** Tombol selebar 58 dp di ujung bilah lebih mahal
   daripada panah yang menumpang di dalam kotak yang sudah ada. Panah hanya tampil saat dibutuhkan,
   dan aturannya ada di `AddressAction`: tampil saat kotak difokuskan, atau saat isi kotak berbeda dari
@@ -218,7 +219,8 @@ bidang penuh 100 satuan persegi diganti silang 28,3 satuan, karena bidang penuh 
 ikon yang jenisnya berbeda dari yang lain, dan itulah yang membuatnya terlihat berat.
 
 Satu pengecualian disengaja: ikon menu tetap berupa tiga titik terisi. Bentuk itu sudah dikenal sebagai
-tombol menu di Android, dan menggantinya dengan versi garis justru membuatnya tidak dikenali.
+tombol menu di Android, dan menggantinya dengan versi garis justru membuatnya tidak dikenali. Versi
+1.10.4 membalik pengecualian ini, dan alasannya ada di bagian 19.
 
 ## 15. Ikon peluncur
 
@@ -248,7 +250,8 @@ seperti sekarang, dan hanya menyetujui satu: tombol 44 dp.
 Yang dipertahankan dan alasannya:
 
 - **Ukuran layar dan tukar tetap hanya di menu.** Chip ukuran di bilah akan mengembalikan 48 dp yang
-  baru saja dihemat, dan pemilik menilai menu sudah cukup.
+  baru saja dihemat, dan pemilik menilai menu sudah cukup. Bagian 19 tetap memenuhinya: ukuran masih
+  hanya terbuka lewat satu ikon, bukan deretan chip yang menetap di bilah.
 - **Sembunyi saat menggulir di dua orientasi.** Panduan menawarkan timer 3 detik khusus mendatar.
   Perilaku gulir dipertahankan karena tidak butuh menunggu, dan menyembunyikan bilah tepat saat
   pengguna berhenti menyentuh adalah hal yang belum diminta.
@@ -275,3 +278,59 @@ pengguna, dan itu lebih membingungkan daripada kembali ke titik awal yang dikena
 ## 18. Yang tidak dijanjikan
 
 Aplikasi ini tidak menampilkan klaim apa pun tentang seberapa besar kemungkinan sebuah situs mendeteksi mode desktop. Panduan bagian 12 menyebut bahwa sebagian situs tetap bisa mendeteksi WebView lewat sinyal lain. Karena itu tidak ada label "anti deteksi", tidak ada persentase keberhasilan, dan tidak ada daftar situs yang "didukung". Yang bisa dibuktikan hanya perilaku aplikasi, dan itu yang ditampilkan.
+
+## 19. Sidebar ukuran
+
+Pemilik meminta tempat ukuran pindah dari menu tetikus ke panel, dan ikon menu tiga titik diganti
+garis tiga. Dua koreksi menyusul setelah pratinjau pertama: panel harus masuk dari kanan karena tombol
+yang digantikannya dulu ada di kanan, dan besar kartu harus mengikuti angka masing-masing, bukan sama
+lebar. Yang diubah dan alasannya:
+
+- **Hamburger menggantikan kebab di tempat yang sama, bukan menambah tombol.** Ia duduk di ujung
+  kanan bilah, dan jumlah tombol tetap empat, jadi lebar kotak alamat tidak berkurang satu piksel pun.
+  Menambah tombol kelima justru memakan 44 dp dari kotak yang sudah sempit di layar tegak.
+- **Panel masuk dari kanan, mengikuti sisi tombolnya.** Menu titik tiga dulu muncul menempel di kanan,
+  jadi panel yang menggantikannya dibuka dari sisi yang sama. Panel dari kiri membuat gerakan yang
+  berlawanan arah dengan tombol yang baru saja diketuk.
+- **Sepuluh kartu, bukan lima preset plus tombol tukar.** Satu kartu menentukan ukuran dan orientasi
+  sekaligus, jadi tidak ada keadaan di mana kartu yang ditandai berbeda dari ukuran yang dipakai
+  halaman. Daftar portrait diturunkan dari daftar landscape di `SIZE_OPTIONS`, bukan ditulis ulang,
+  supaya mustahil ada ukuran yang hanya muncul di satu arah. Dua bagiannya berlabel Landscape dan
+  Portrait, memakai istilah yang sama dengan yang dipakai situs dan alat desain, bukan terjemahan
+  mendatar dan tegak yang bisa berarti dua hal.
+- **Kartu digambar dengan satu skala, bukan lebar yang sama.** Pemilik meminta besar kartu relatif
+  terhadap angkanya. Sisi terpanjang di antara semua kartu dipakai sebagai acuan, yaitu 1920, lalu
+  setiap kartu digambar dengan pembagi yang sama. Akibatnya kartu 1920 x 1080 tampil 48 dp x 27 dp,
+  sedangkan kartu 1024 x 768 hanya 25,6 dp x 19,2 dp. Rasio tiap kartu tetap sama dengan ukuran
+  sebenarnya, jadi bentuk dan besarnya sama-sama memberi tahu apa yang dipilih. Dengan lebar seragam,
+  kartu 1024 tampak sama besar dengan kartu 1920 dan satu-satunya pembeda tinggal labelnya.
+- **Sisi terpanjang 48 dp, bukan tinggi sel atau lebar panel.** Pemilik meminta kartu seukuran dua ikon
+  rotate, jadi kartu terbesar berukuran 48 dp di sisi panjangnya. Sidebar 284 dp, isinya 252 dp, dibagi
+  empat kolom jadi sel 63 dp.
+- **Kisi 4 x 2 dengan sel seragam, lima terisi dan tiga kosong.** Pemilik meminta tiap bagian berbentuk
+  kisi empat kolom dua baris dengan lebar dan tinggi sel yang sama semua, dan memutuskan tiga slot
+  sisanya dikosongkan dulu, bukan diisi ukuran baru. Slot kosong tetap dipasang sebagai View tanpa
+  gambar, karena tanpa mereka baris kedua hanya punya satu anak dan tingginya menciut. Sel 63 dp x
+  64 dp: 48 dp untuk gambar kartu dan 16 dp untuk label.
+- **Jarak antarbagian dua kali lebih besar daripada jarak judul ke kisinya.** Judul bagian adalah milik
+  kisinya, jadi jaraknya 4 dp. Antar bagian 24 dp, ditambah 10 dp sisa baris terakhir, jadi 34 dp.
+  Dengan jarak yang sama rata, dua bagian itu terbaca sebagai satu daftar panjang berisi sepuluh kartu,
+  bukan dua kelompok berisi lima.
+- **Label di dasar sel, kartu di tengah ruang di atasnya.** Label duduk di dasar sel supaya satu baris
+  label selalu sejajar. Kartu diletakkan di tengah ruang yang tersisa, kiri kanan dan atas bawah, jadi
+  kartu 16:9 dan kartu 4:3 sama-sama berada di tengah selnya dan bedanya terbaca dari bentuk. Label
+  8 sp menyusut sendiri sampai 6 sp karena `1920 × 1080` tidak muat di 63 dp pada ukuran penuh.
+- **Pilihan ditandai garis, bukan bidang penuh.** Bidang penuh pada satu kartu membuat kartu itu
+  terbaca sebagai tombol, bukan sebagai keadaan. Yang dipakai garis 2 dp di tepi kartu.
+- **Sidebar menutup setelah kartu dipilih.** Panel selebar 284 dp menutupi hampir seluruh layar tegak,
+  jadi membiarkannya terbuka berarti pengguna tidak melihat akibat pilihannya. Membuka lagi hanya satu
+  ketukan.
+- **Tombol kembali menutup sidebar lebih dulu.** Urutannya sidebar, lalu video fullscreen, lalu riwayat
+  halaman. Lapisan yang sedang menutupi layar ditutup lebih dulu, karena mundur ke halaman di bawahnya
+  terasa seperti tombol yang tidak bekerja.
+- **Info halaman pindah ke dasar sidebar, isinya tidak berubah.** Diagnostik masih memakai dialog yang
+  sama, dan `kal:info` di kolom alamat tetap jalan. Yang berubah hanya jalan masuknya.
+
+Ikon garis tiga digambar dengan aturan yang sama seperti ikon lain: tiga garis mendatar, tebal 2,
+ujung membulat, panjang 16 satuan di kisi 24. Ia menempati pengecualian yang dulu dibuat untuk menu
+tiga titik, karena sekarang tombolnya memang membuka panel berisi daftar, bukan menu tetikus.

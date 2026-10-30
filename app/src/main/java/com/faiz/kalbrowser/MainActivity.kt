@@ -14,7 +14,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.view.Gravity
-import android.view.Menu
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
@@ -27,7 +26,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
-import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
@@ -42,7 +40,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.faiz.kalbrowser.PRESETS
 import com.faiz.kalbrowser.data.SharedPreferencesSettings
 import com.faiz.kalbrowser.databinding.ActivityMainBinding
 import com.faiz.kalbrowser.desktop.DesktopMode
@@ -55,6 +52,7 @@ import com.faiz.kalbrowser.ui.BrowserCommand
 import com.faiz.kalbrowser.ui.BrowserUiState
 import com.faiz.kalbrowser.ui.BrowserViewModel
 import com.faiz.kalbrowser.ui.Letterbox
+import com.faiz.kalbrowser.ui.SizeGrid
 import com.faiz.kalbrowser.ui.ViewportFit
 import org.json.JSONTokener
 import kotlinx.coroutines.launch
@@ -84,6 +82,10 @@ class MainActivity : AppCompatActivity() {
     private var chromeTersembunyi = false
     private var tinggiChrome = 0
 
+    /** Sidebar ukuran yang sedang terbuka, dan pengisi kisi di dalamnya. */
+    private var sidebarTerbuka = false
+    private lateinit var sizeGrid: SizeGrid
+
     /** Getaran gulir sekecil ini tidak dianggap niat menyembunyikan bilah. */
     private val ambangGulir by lazy { (8 * resources.displayMetrics.density).toInt() }
 
@@ -91,6 +93,10 @@ class MainActivity : AppCompatActivity() {
         /** Cukup cepat supaya terasa mengikuti jari, cukup lambat supaya terlihat. */
         const val SEMBUNYI_DURASI = 180L
         const val TAMPIL_DURASI = 150L
+
+        /** Sidebar bergerak lebih lambat daripada bilah alamat, karena jarak
+         *  tempuhnya sepanjang setengah layar. */
+        const val SIDEBAR_DURASI = 200L
     }
 
     private data class PermintaanUnduh(
@@ -139,6 +145,7 @@ class MainActivity : AppCompatActivity() {
         setupWebView()
 
         setupControls()
+        setupSidebar()
         observeUiState()
         observeCommands()
 
@@ -214,6 +221,7 @@ class MainActivity : AppCompatActivity() {
                     callback.onCustomViewHidden()
                     return
                 }
+                tutupSidebar()
                 customView = view
                 customViewCallback = callback
                 binding.fullscreenContainer.addView(
@@ -324,7 +332,7 @@ class MainActivity : AppCompatActivity() {
         binding.buttonForward.setOnClickListener { viewModel.goForward() }
         binding.buttonReload.setOnClickListener { viewModel.reloadOrStop() }
 
-        binding.buttonMenu.setOnClickListener { showMenu() }
+        binding.buttonSidebar.setOnClickListener { bukaSidebar() }
         binding.buttonGo.setOnClickListener { submitAddress() }
 
         binding.addressBar.setOnEditorActionListener { _, actionId, _ ->
@@ -350,9 +358,13 @@ class MainActivity : AppCompatActivity() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    // Urutannya disengaja: video fullscreen ditutup lebih dulu,
-                    // karena mundur ke halaman sebelumnya saat video masih
-                    // menutupi layar terasa seperti tombol yang tidak bekerja.
+                    // Urutannya disengaja: lapisan yang sedang menutupi layar
+                    // ditutup lebih dulu, karena mundur ke halaman sebelumnya di
+                    // bawah lapisan itu terasa seperti tombol yang tidak bekerja.
+                    if (sidebarTerbuka) {
+                        tutupSidebar()
+                        return
+                    }
                     if (customView != null) {
                         keluarDariFullscreen()
                         return
@@ -369,39 +381,74 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Menu berisi semua pilihan yang dulu menempati baris kedua. Ukuran yang
-     * sedang aktif ditandai centang, dan nilainya ditulis di judul supaya tetap
-     * terbaca tanpa harus menghitung baris.
+     * Mengisi kisi ukuran sekali saja. Kartunya menetap, yang berubah hanya
+     * penanda pilihan, jadi sidebar tidak dibangun ulang setiap kali dibuka.
      */
-    private fun showMenu() {
-        val state = viewModel.uiState.value
-        val menu = PopupMenu(this, binding.buttonMenu)
-        val grupUkuran = 1
-        val idTukar = 900
-        val idInfo = 901
-
-        menu.menu.add(Menu.NONE, Menu.NONE, 0, getString(R.string.menu_screen_size))
-            .apply { isEnabled = false }
-        PRESETS.forEachIndexed { index, preset ->
-            val item = menu.menu.add(grupUkuran, index, index + 1, preset.label)
-            item.isCheckable = true
-            item.isChecked = index == state.selectedPresetIndex
+    private fun setupSidebar() {
+        sizeGrid = SizeGrid(this) { opsi ->
+            viewModel.selectSize(opsi.presetIndex, opsi.portrait)
+            // Sidebar menutupi hampir seluruh lebar layar, jadi hasil pilihan
+            // baru terlihat setelah panelnya ditutup.
+            tutupSidebar()
         }
-        menu.menu.setGroupCheckable(grupUkuran, true, true)
+        sizeGrid.pasang(binding.gridLandscape, binding.gridPortrait)
+        sizeGrid.tandaiAktif(
+            viewModel.uiState.value.selectedPresetIndex,
+            viewModel.uiState.value.isPortrait,
+        )
 
-        menu.menu.add(Menu.NONE, idTukar, 100, getString(R.string.menu_rotate))
-            .setIcon(R.drawable.ic_rotate_square)
-        menu.menu.add(Menu.NONE, idInfo, 101, getString(R.string.menu_diagnostics))
+        binding.sidebarScrim.setOnClickListener { tutupSidebar() }
+        // Permintaan pemilik: isi info halaman tidak berubah, hanya tempatnya
+        // yang pindah ke dalam sidebar.
+        binding.sidebarInfo.setOnClickListener { showDiagnostics() }
+    }
 
-        menu.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                idTukar -> viewModel.rotate()
-                idInfo -> showDiagnostics()
-                else -> viewModel.selectPreset(item.itemId)
+    private fun bukaSidebar() {
+        if (sidebarTerbuka) return
+        sidebarTerbuka = true
+
+        // Keyboard dan fokus kolom alamat dilepas lebih dulu, karena keduanya
+        // akan menutupi separuh sidebar dan menahan kursor di tempat lain.
+        binding.addressBar.clearFocus()
+        hideKeyboard()
+
+        val lebar = resources.getDimension(R.dimen.sidebar_width)
+
+        binding.sidebarScrim.animate().cancel()
+        binding.sidebarScrim.alpha = 0f
+        binding.sidebarScrim.visibility = View.VISIBLE
+        binding.sidebarScrim.animate().alpha(1f).setDuration(SIDEBAR_DURASI).start()
+
+        binding.sidebar.animate().cancel()
+        binding.sidebar.translationX = lebar
+        binding.sidebar.visibility = View.VISIBLE
+        binding.sidebar.animate().translationX(0f).setDuration(SIDEBAR_DURASI).start()
+    }
+
+    private fun tutupSidebar() {
+        if (!sidebarTerbuka) return
+        sidebarTerbuka = false
+
+        // Animasi yang sudah berjalan dibatalkan lebih dulu supaya arah gerak
+        // yang lama tidak menang melawan arah yang baru.
+        binding.sidebarScrim.animate().cancel()
+        binding.sidebarScrim.animate()
+            .alpha(0f)
+            .setDuration(SIDEBAR_DURASI)
+            .withEndAction {
+                if (!sidebarTerbuka) binding.sidebarScrim.visibility = View.GONE
             }
-            true
-        }
-        menu.show()
+            .start()
+
+        val lebar = resources.getDimension(R.dimen.sidebar_width)
+        binding.sidebar.animate().cancel()
+        binding.sidebar.animate()
+            .translationX(lebar)
+            .setDuration(SIDEBAR_DURASI)
+            .withEndAction {
+                if (!sidebarTerbuka) binding.sidebar.visibility = View.GONE
+            }
+            .start()
     }
 
     private fun perbaruiPanahAlamat(state: BrowserUiState = viewModel.uiState.value) {
@@ -437,6 +484,10 @@ class MainActivity : AppCompatActivity() {
         // tidak kursor ketik akan melompat ke ujung setiap kali progres bergerak.
         if (!binding.addressBar.hasFocus() && binding.addressBar.text.toString() != state.address) {
             binding.addressBar.setText(state.address)
+        }
+
+        if (::sizeGrid.isInitialized) {
+            sizeGrid.tandaiAktif(state.selectedPresetIndex, state.isPortrait)
         }
 
         binding.buttonBack.isEnabled = state.canGoBack
