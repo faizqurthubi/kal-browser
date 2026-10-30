@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Tombol ikon memakai latar ripple tanpa kotak, supaya chrome tidak
-         menambah bidang warna yang bersaing dengan halaman web. -->
+    <!-- Ripple dibiarkan tanpa batas sesuai keputusan pemilik. Padding 10 dp
+         membuat glyph 24 dp pas di tengah tombol 44 dp. -->
     <style name="Widget.KalBrowser.IconButton" parent="Widget.AppCompat.ActionButton">
         <item name="android:layout_width">@dimen/icon_button_size</item>
         <item name="android:layout_height">@dimen/icon_button_size</item>
         <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
-        <item name="android:padding">8dp</item>
+        <item name="android:padding">10dp</item>
         <item name="android:scaleType">fitCenter</item>
         <item name="android:tint">@color/icon_tint</item>
     </style>

@@ -240,7 +240,28 @@ Tiga bentuk dihasilkan dari satu sumber yang sama:
 - **Raster** untuk Android 7 dan sebagian peluncur lama, dihasilkan dari vektor yang sama pada lima
   kerapatan, bukan dari gambar kiriman.
 
-## 16. Yang disimpan dan yang tidak
+## 16. Keputusan atas panduan Fase 2
+
+Panduan Fase 2 mengusulkan enam perubahan besar. Pemilik memilih mempertahankan lima di antaranya
+seperti sekarang, dan hanya menyetujui satu: tombol 44 dp.
+
+Yang dipertahankan dan alasannya:
+
+- **Ukuran layar dan tukar tetap hanya di menu.** Chip ukuran di bilah akan mengembalikan 48 dp yang
+  baru saja dihemat, dan pemilik menilai menu sudah cukup.
+- **Sembunyi saat menggulir di dua orientasi.** Panduan menawarkan timer 3 detik khusus mendatar.
+  Perilaku gulir dipertahankan karena tidak butuh menunggu, dan menyembunyikan bilah tepat saat
+  pengguna berhenti menyentuh adalah hal yang belum diminta.
+- **Bilah satu baris 48 dp.** Dua baris di tegak berarti 100 dp chrome, dan halaman kehilangan 57 dp.
+- **Ripple tanpa batas.** Panduan mengusulkan ripple oval berbatas. Pemilik memilih tanpa batas.
+
+Satu hal tetap tidak saya sentuh: bilah status sistem tidak pernah disembunyikan, karena pemilik
+sudah menegur kekeliruan itu sekali.
+
+Akibatnya panduan Fase 2 hanya mengubah satu angka di aplikasi ini. Itu bukan kegagalan, tapi hasil
+dari membaca kode yang sudah ada sebelum mengerjakan dokumen baru.
+
+## 17. Yang disimpan dan yang tidak
 
 Ukuran layar dan orientasi virtual disimpan karena itu pilihan yang disengaja pengguna dan memilihnya
 ulang setiap kali membuka aplikasi adalah pekerjaan yang tidak perlu. Alamat terakhir tidak disimpan,
@@ -251,6 +272,6 @@ Pilihan tersimpan yang tidak lagi dikenal dikembalikan ke ukuran bawaan, bukan d
 terdekat. Memotong diam-diam berarti menampilkan halaman pada ukuran yang tidak pernah dipilih
 pengguna, dan itu lebih membingungkan daripada kembali ke titik awal yang dikenal.
 
-## 17. Yang tidak dijanjikan
+## 18. Yang tidak dijanjikan
 
 Aplikasi ini tidak menampilkan klaim apa pun tentang seberapa besar kemungkinan sebuah situs mendeteksi mode desktop. Panduan bagian 12 menyebut bahwa sebagian situs tetap bisa mendeteksi WebView lewat sinyal lain. Karena itu tidak ada label "anti deteksi", tidak ada persentase keberhasilan, dan tidak ada daftar situs yang "didukung". Yang bisa dibuktikan hanya perilaku aplikasi, dan itu yang ditampilkan.

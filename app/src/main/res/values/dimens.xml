@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="toolbar_height">48dp</dimen>
-    <dimen name="icon_button_size">48dp</dimen>
+    <!-- 44 dp adalah batas bawah sasaran sentuh yang masih nyaman. Bilah tetap
+         48 dp, jadi tombol duduk di tengah tanpa menambah tinggi chrome. -->
+    <dimen name="icon_button_size">44dp</dimen>
     <dimen name="divider_width">1dp</dimen>
     <dimen name="progress_height">2dp</dimen>
     <dimen name="field_radius">4dp</dimen>
