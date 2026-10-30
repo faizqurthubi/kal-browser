@@ -51,6 +51,7 @@ import com.faiz.kalbrowser.domain.Upload
 import com.faiz.kalbrowser.ui.BrowserCommand
 import com.faiz.kalbrowser.ui.BrowserUiState
 import com.faiz.kalbrowser.ui.BrowserViewModel
+import com.faiz.kalbrowser.ui.FoldArrow
 import com.faiz.kalbrowser.ui.Letterbox
 import com.faiz.kalbrowser.ui.SizeGrid
 import com.faiz.kalbrowser.ui.ViewportFit
@@ -879,9 +880,11 @@ class MainActivity : AppCompatActivity() {
     /**
      * Menaruh isi aplikasi terhadap bilah sistem dan lubang kamera.
      *
-     * Saat bilah alamat terlihat, padding atas mengikuti inset yang lebih besar
-     * antara bilah status dan kamera, jadi tidak ada tombol yang tertutup.
-     * Saat terlipat, padding atas nol: itulah ruang yang dipakai halaman.
+     * Pembagiannya disengaja: wadah kertas hanya menerima padding tegak, bilah
+     * alamat hanya padding mendatar, dan wadah halaman menerima sisanya. Padding
+     * tegak di bilah alamat membuat tingginya bertambah dan isinya terdorong
+     * keluar, sedangkan padding di pita setinggi 14 dp bisa menghabiskan ruang
+     * isinya sampai panahnya hilang. Keduanya sempat terjadi.
      */
     private fun terapkanInset(inset: WindowInsetsCompat) {
         val bilah = inset.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -892,57 +895,44 @@ class MainActivity : AppCompatActivity() {
         val bawah = maxOf(bilah.bottom, kamera.bottom)
         val atas = if (bilahTerlipat) 0 else maxOf(bilah.top, kamera.top)
 
-        // Bilah alamat dan pitanya diberi jarak dari lubang kamera dan bilah
-        // navigasi, supaya tidak ada tombol yang berada di bawah keduanya.
-        binding.chromeBar.setPadding(kiri, atas, kanan, 0)
-        binding.foldHandle.setPadding(kiri, 0, kanan, 0)
+        // Nol saat terlipat. Itulah ruang bilah status yang dipakai halaman.
+        binding.browserContent.setPadding(0, atas, 0, 0)
 
-        // Halaman diberi jarak yang sama, tapi latar wadahnya hitam. Dulu
-        // padding ini dipasang di wadah kertas, dan hasilnya pita putih di sisi
-        // layar yang berlubang kamera.
+        binding.chromeBar.setPadding(kiri, 0, kanan, 0)
+
+        // Latar wadah ini hitam, jadi sisa ruang di sisi lubang kamera dan di
+        // atas bilah navigasi terbaca sebagai tepi monitor virtual.
         binding.viewportWrap.setPadding(kiri, 0, kanan, bawah)
 
-        // Sidebar ikut digeser, karena judulnya bisa berada di bawah lubang
-        // kamera saat layar mendatar.
         binding.sidebar.setPadding(kiri, atas, kanan, bawah)
 
-        val lebar = binding.foldHandle.width
-        if (lebar > 0) aturPanah(inset, lebar - kiri - kanan)
+        aturPanah(inset)
     }
 
     /**
-     * Panah di pita bisa berada tepat di bawah lubang kamera depan saat bilah
-     * terlipat, karena pitanya memang menempati tepi paling atas. Kalau itu
-     * terjadi, hanya panahnya yang digeser ke sisi lubang, pitanya tetap selebar
-     * layar. Posisi mendatar panah tidak lagi di tengah pada perangkat berpunch
-     * hole; ini harga dari memakai ruang bilah status.
+     * Menggeser panah pita kalau lubang kamera menutupi titik tengahnya.
+     *
+     * Pita tidak diberi padding mendatar, jadi pergeseran dihitung dari lebar
+     * pitanya sendiri. Tanpa ini panah bisa berada tepat di bawah lubang kamera
+     * saat bilah terlipat, karena pitanya memang menempati tepi paling atas.
      */
-    private fun aturPanah(inset: WindowInsetsCompat, lebarPita: Int) {
-        if (!bilahTerlipat || lebarPita <= 0) {
+    private fun aturPanah(inset: WindowInsetsCompat) {
+        val lubang = inset.displayCutout?.boundingRects?.firstOrNull()
+        if (!bilahTerlipat || lubang == null) {
             binding.foldArrow.translationX = 0f
             return
         }
 
-        // Titik tengah pita diukur dari sisi kiri isinya, dan lubang kamera
-        // dipetakan ke koordinat yang sama.
-        val geser = binding.foldHandle.paddingLeft.toFloat()
-        val tengah = geser + lebarPita / 2f
-        val batasKanan = geser + lebarPita.toFloat()
-        val lubang = inset.displayCutout
-            ?.boundingRects
-            ?.firstOrNull { kotak ->
-                kotak.top < binding.foldHandle.height && kotak.bottom > 0 &&
-                    tengah >= kotak.left && tengah <= kotak.right
-            }
-
-        binding.foldArrow.translationX = if (lubang == null) {
-            0f
-        } else {
-            val jarak = (6 * resources.displayMetrics.density).toInt()
-            val tujuan = lubang.right + jarak + binding.foldArrow.width / 2f
-            val batas = batasKanan - binding.foldArrow.width / 2f - jarak
-            (tujuan - tengah).coerceAtMost(batas - tengah)
-        }
+        binding.foldArrow.translationX = FoldArrow.geser(
+            lebarPita = binding.foldHandle.width.toFloat(),
+            lebarPanah = binding.foldArrow.width.toFloat(),
+            lubangKiri = lubang.left.toFloat(),
+            lubangKanan = lubang.right.toFloat(),
+            lubangAtas = lubang.top.toFloat(),
+            lubangBawah = lubang.bottom.toFloat(),
+            tinggiPita = binding.foldHandle.height.toFloat(),
+            jarak = 6 * resources.displayMetrics.density,
+        )
     }
 
     private fun syncHistory() {

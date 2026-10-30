@@ -418,3 +418,18 @@ judul halaman tertutup pita lipat, dan sisi kiri layar berwarna putih di area lu
 
 Yang perlu diuji di perangkat: apakah judul situs sekarang utuh, apakah sisi layar sudah hitam, dan
 berapa tambahan tinggi halaman yang benar-benar didapat dari hilangnya bilah status.
+
+## 23. Padding inset yang menghabiskan pita
+
+Pemilik melaporkan pita lipat dan panahnya hilang di dua orientasi setelah 1.10.7. Penyebabnya padding
+inset yang saya pasang di tempat yang salah:
+
+- **Padding mendatar dipasang di pita setinggi 14 dp.** Padding kiri dan kanan sebesar inset lubang
+  kamera menghabiskan seluruh lebar isi pita, jadi panahnya tidak punya ruang dan tidak tampak.
+- **Padding tegak dipasang di bilah alamat.** Tinggi bilah jadi bertambah sebesar inset, dan isinya
+  terdorong ke luar area yang terlihat.
+
+Pembagiannya sekarang satu arah per wadah: wadah kertas hanya menerima padding tegak, bilah alamat
+hanya padding mendatar, wadah halaman menerima padding kiri, kanan, dan bawah, dan pita tidak menerima
+padding sama sekali. Kalau lubang kamera menutupi titik tengah pita, hanya panahnya yang digeser, dan
+perhitungannya dipindah ke `FoldArrow` supaya bisa diuji tanpa perangkat.
