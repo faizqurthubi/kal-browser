@@ -200,7 +200,8 @@ Yang berubah dan alasannya:
   daripada panah yang menumpang di dalam kotak yang sudah ada. Panah hanya tampil saat dibutuhkan,
   dan aturannya ada di `AddressAction`: tampil saat kotak difokuskan, atau saat isi kotak berbeda dari
   alamat halaman. Tanpa bagian kedua, ketikan yang belum dikirim bisa kehilangan jalan keluarnya.
-- **Bilah alamat menyembunyikan diri saat halaman digulir ke bawah.** Ini memberi 48 dp tambahan justru
+- **Bilah alamat menyembunyikan diri saat halaman digulir ke bawah.** Cara ini diganti lipat manual di
+  versi 1.10.5, lihat bagian 20; uraian berikut berlaku untuk versi sebelum itu. Ini memberi 48 dp tambahan justru
   saat dibutuhkan, yaitu ketika halaman sedang dibaca, dan mengembalikannya saat pengguna menggulir
   naik atau berpindah halaman. Bilah status dan bilah navigasi sistem tidak disentuh, karena keduanya
   bukan bagian aplikasi dan pengguna membutuhkannya untuk melihat jam dan baterai.
@@ -334,3 +335,32 @@ lebar. Yang diubah dan alasannya:
 Ikon garis tiga digambar dengan aturan yang sama seperti ikon lain: tiga garis mendatar, tebal 2,
 ujung membulat, panjang 16 satuan di kisi 24. Ia menempati pengecualian yang dulu dibuat untuk menu
 tiga titik, karena sekarang tombolnya memang membuka panel berisi daftar, bukan menu tetikus.
+
+## 20. Bilah alamat bisa dilipat
+
+Pemilik meminta bilah alamat tidak lagi menyembunyikan diri sendiri saat halaman digulir, dan diganti
+lipat manual lewat pita tipis di bawah bilah. Yang berubah dan alasannya:
+
+- **Sembunyi otomatis dibuang seluruhnya.** Selama ini bilah menyingkir sendiri tanpa diminta, dan itu
+  mengubah tinggi halaman di tengah membaca: di mendatar halaman membesar dari 526 x 296 ke 613 x 345,
+  sekitar 17 persen, lalu mengecil lagi saat digulir naik. Bilah yang hanya bergerak kalau pengguna
+  memintanya menghapus kejutan itu, dan `ChromeVisibility` beserta test-nya dihapus karena satu-satunya
+  tugasnya memang mengatur kapan boleh menyingkir.
+- **Pita 14 dp, bukan 48 dp.** Pemilik memilih 14 dp, sekitar 1/5 tinggi bilah, supaya pitanya tetap
+  terasa seperti pegangan dan bukan baris kedua. Ini di bawah sasaran sentuh Android yang lazim, 48 dp,
+  dan juga di bawah 44 dp yang dipakai tombol bilah. Yang meringankannya: pitanya selebar layar, jadi
+  hanya arah vertikal yang perlu ketelitian, dan panahnya ada di tengah. Kalau nanti terasa susah
+  ditekan, satu angka di `dimens.xml` cukup diubah.
+- **Pita menumpang, bukan menambah tinggi.** Ia berada di lapisan teratas, di atas wadah halaman. Saat
+  bilah terbuka ia duduk tepat di bawah bilah, dan saat bilah terlipat ia naik bersama bilah sampai
+  berhenti di tepi atas layar. Karena tidak pernah masuk tata letak, ia tidak pernah menambah tinggi
+  chrome dan tidak pernah mengubah ukuran virtual halaman. Harganya: 14 dp teratas halaman selalu
+  tertutup pita, dan sentuhan di jalur itu jatuh ke pita, bukan ke situs.
+- **Pita ikut bergerak bersama bilah, bukan menetap di tepi atas.** Pemilik memilih ini. Keuntungannya
+  saat bilah terbuka tidak ada ruang yang terbuang; kekurangannya titik ketuknya berpindah 48 dp antara
+  keadaan terbuka dan terlipat. Karena itu panahnya selalu menunjuk ke arah gerak berikutnya, dan
+  pitanya tetap di tengah layar supaya arah horizontal tidak pernah berubah.
+- **Kolom alamat yang disentuh selalu membuka bilah.** Tanpa itu, kursor akan mengetik di kolom setinggi
+  nol. Ini satu-satunya keadaan yang membuka bilah tanpa pitanya disentuh.
+- **Perputaran layar membuka bilah.** Tata letak berubah total saat diputar, dan pita yang terlipat di
+  tata letak baru sulit ditemukan kembali.

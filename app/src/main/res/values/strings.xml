@@ -26,6 +26,8 @@
     <string name="diagnostics_copied">Info halaman tersalin</string>
     <string name="diagnostics_copy_failed">Info halaman tidak bisa disalin</string>
 
+    <string name="action_fold_bar">Lipat bilah alamat</string>
+    <string name="action_unfold_bar">Buka bilah alamat</string>
     <string name="action_sidebar">Menu ukuran dan info</string>
     <string name="sidebar_sizes">Ukuran layar</string>
     <string name="sidebar_landscape">Landscape</string>

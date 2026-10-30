@@ -166,6 +166,38 @@
 
     </LinearLayout>
 
+    <!-- Pita lipat. Ia menumpang di atas lapisan halaman, bukan bagian dari
+         tata letak, supaya tinggi halaman tidak pernah berubah karena pita ini.
+         Saat bilah alamat terbuka ia duduk tepat di bawah bilah, dan saat bilah
+         terlipat ia berhenti di tepi atas layar dengan posisi ketuk yang sama. -->
+    <FrameLayout
+        android:id="@+id/fold_handle"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/fold_handle_height"
+        android:layout_gravity="top"
+        android:background="@color/paper"
+        android:clickable="true"
+        android:contentDescription="@string/action_fold_bar"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/fold_arrow"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_fold_arrow"
+            android:tint="@color/ink_muted" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="@color/divider" />
+
+    </FrameLayout>
+
     <!-- Lapisan gelap saat sidebar terbuka. Mengetuknya menutup sidebar, dan ia
          menahan sentuhan supaya halaman di bawahnya tidak ikut bergerak. -->
     <View

@@ -16,6 +16,9 @@
     <dimen name="size_cell_height">64dp</dimen>
     <!-- Jarak judul bagian ke kisinya kecil, karena keduanya satu kelompok.
          Jarak antarbagian besar, karena keduanya kelompok yang berbeda. -->
+    <!-- Pita lipat. Tingginya sengaja tipis karena ia menumpang di atas
+         halaman saat bilah alamat terlipat. -->
+    <dimen name="fold_handle_height">14dp</dimen>
     <dimen name="size_label_gap">4dp</dimen>
     <dimen name="size_section_gap">24dp</dimen>
     <dimen name="size_heading_gap">8dp</dimen>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Panah lipat. Kisi 12 dipakai, bukan 24 seperti ikon lain, karena pitanya
+     hanya 14 dp dan lengkung 24 akan tampak seperti titik. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="12dp"
+    android:height="12dp"
+    android:viewportWidth="12"
+    android:viewportHeight="12">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M3,8 L6,5 L9,8"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.6" />
+</vector>

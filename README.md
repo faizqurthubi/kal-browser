@@ -137,9 +137,11 @@ bilah, 48 dp. Ikon itu menempati tempat menu titik tiga yang digantikannya.
   kartunya dan labelnya dicetak lebih tegas.
 - **Panah kirim** ada di dalam kotak alamat, di sisi kanan. Muncul saat kotak sedang dipakai, atau saat
   isinya berbeda dari alamat halaman yang terbuka.
-- **Bilah alamat menyembunyikan diri.** Saat halaman digulir ke bawah, bilah alamat menyingkir ke atas
-  dan ruangnya dipakai halaman. Menggulir ke atas memunculkannya lagi. Di puncak halaman bilah selalu
-  terlihat, dan selama kolom alamat sedang dipakai bilah tidak pernah menyingkir.
+- **Bilah alamat bisa dilipat sendiri.** Di bawah bilah ada pita tipis 14 dp berisi panah. Mengetuknya
+  melipat bilah ke atas, dan mengetuk lagi membukanya. Bilah tidak pernah bergerak sendiri: tidak ada
+  lagi sembunyi otomatis saat halaman digulir. Pita itu menumpang di lapisan atas, jadi ia tidak
+  menambah tinggi chrome; saat bilah terlipat ia berhenti di tepi atas layar dan tetap bisa diketuk di
+  titik yang sama. Mengetuk kolom alamat saat bilah terlipat otomatis membukanya.
 - **Bilah status dan bilah navigasi sistem** tetap terlihat seperti biasa, karena itu bukan bagian
   aplikasi. Hanya video fullscreen yang menutupi keduanya.
 - **Bilah progres** berupa garis 2 dp di bawah bilah atas, dan hanya muncul saat halaman dimuat.

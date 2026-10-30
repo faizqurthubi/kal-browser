@@ -45,7 +45,6 @@ import com.faiz.kalbrowser.databinding.ActivityMainBinding
 import com.faiz.kalbrowser.desktop.DesktopMode
 import com.faiz.kalbrowser.desktop.DesktopSpoof
 import com.faiz.kalbrowser.domain.AddressAction
-import com.faiz.kalbrowser.domain.ChromeVisibility
 import com.faiz.kalbrowser.domain.Download
 import com.faiz.kalbrowser.domain.Upload
 import com.faiz.kalbrowser.ui.BrowserCommand
@@ -78,21 +77,18 @@ class MainActivity : AppCompatActivity() {
     /** Unduhan yang menunggu izin tulis, hanya dipakai di Android 9 ke bawah. */
     private var unduhanTertunda: PermintaanUnduh? = null
 
-    /** Keadaan bilah alamat, dan tingginya saat terakhir terlihat. */
-    private var chromeTersembunyi = false
-    private var tinggiChrome = 0
+    /** Bilah alamat sedang terlipat, dan tingginya saat terakhir terlihat. */
+    private var bilahTerlipat = false
+    private var tinggiBilah = 0
 
     /** Sidebar ukuran yang sedang terbuka, dan pengisi kisi di dalamnya. */
     private var sidebarTerbuka = false
     private lateinit var sizeGrid: SizeGrid
 
-    /** Getaran gulir sekecil ini tidak dianggap niat menyembunyikan bilah. */
-    private val ambangGulir by lazy { (8 * resources.displayMetrics.density).toInt() }
-
     private companion object {
         /** Cukup cepat supaya terasa mengikuti jari, cukup lambat supaya terlihat. */
-        const val SEMBUNYI_DURASI = 180L
-        const val TAMPIL_DURASI = 150L
+        const val LIPAT_DURASI = 180L
+        const val BUKA_DURASI = 150L
 
         /** Sidebar bergerak lebih lambat daripada bilah alamat, karena jarak
          *  tempuhnya sepanjang setengah layar. */
@@ -146,6 +142,7 @@ class MainActivity : AppCompatActivity() {
 
         setupControls()
         setupSidebar()
+        setupPita()
         observeUiState()
         observeCommands()
 
@@ -186,9 +183,6 @@ class MainActivity : AppCompatActivity() {
                 viewModel.onPageStarted(url.orEmpty())
                 desktopMode.injectViewportNow()
                 syncHistory()
-                // Halaman baru selalu dimulai dengan bilah terlihat, supaya
-                // alamat dan progres muat tidak tersembunyi di luar layar.
-                tampilkanChrome()
             }
 
             override fun onPageFinished(view: WebView, url: String?) {
@@ -287,24 +281,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Bilah alamat menyingkir saat halaman digulir ke bawah dan kembali saat
-        // digulir ke atas. Aturan kapan boleh menyingkir ada di ChromeVisibility.
-        binding.webView.setOnScrollChangeListener { _, _, posisi, _, posisiLama ->
-            when (
-                ChromeVisibility.putuskan(
-                    tersembunyi = chromeTersembunyi,
-                    geser = posisi - posisiLama,
-                    posisiGulir = posisi,
-                    ambang = ambangGulir,
-                    alamatDifokuskan = binding.addressBar.hasFocus(),
-                )
-            ) {
-                ChromeVisibility.Aksi.Sembunyikan -> sembunyikanChrome()
-                ChromeVisibility.Aksi.Tampilkan -> tampilkanChrome()
-                ChromeVisibility.Aksi.TidakBerubah -> Unit
-            }
-        }
-
         // Berkas diserahkan ke pengunduh sistem, bukan diunduh sendiri, supaya
         // muncul di aplikasi Unduhan dan tahan walau aplikasi ditutup.
         binding.webView.setDownloadListener { url, userAgent, contentDisposition, mimeType, _ ->
@@ -347,7 +323,7 @@ class MainActivity : AppCompatActivity() {
         // Panah di dalam kotak bergantung pada fokus dan pada isi kotak, jadi
         // keduanya dipantau. Aturannya ada di AddressAction supaya bisa diuji.
         binding.addressBar.onFocusChangeListener = View.OnFocusChangeListener { _, fokus ->
-            if (fokus) tampilkanChrome()
+            if (fokus) bukaBilah()
             perbaruiPanahAlamat()
         }
         binding.addressBar.doAfterTextChanged { perbaruiPanahAlamat() }
@@ -779,46 +755,94 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Menyingkirkan bilah alamat ke atas layar, lalu melepasnya dari tata letak
-     * supaya ruangnya dipakai halaman. Pelepasan dilakukan setelah animasi
-     * selesai, karena mengubah tinggi bilah selama animasi memicu perhitungan
-     * ulang kotak virtual di setiap bingkai.
+     * Menyiapkan pita lipat.
+     *
+     * Pita berada di lapisan teratas, bukan di dalam tata letak, jadi ia tidak
+     * pernah menambah tinggi chrome dan tidak pernah mengubah tinggi halaman.
+     * Yang berubah hanya posisinya: menempel di bawah bilah saat bilah terbuka,
+     * dan berhenti di tepi atas layar saat bilah terlipat.
      */
-    private fun sembunyikanChrome() {
-        if (chromeTersembunyi || customView != null) return
+    private fun setupPita() {
+        binding.foldHandle.setOnClickListener {
+            if (bilahTerlipat) bukaBilah() else lipatBilah()
+        }
+        // Tinggi bilah berubah saat bilah progres muncul dan hilang, jadi pita
+        // dihitung ulang setiap kali tinggi itu berubah.
+        binding.chromeBar.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if ((bottom - top) != (oldBottom - oldTop) && !bilahTerlipat) letakkanPita()
+        }
+        binding.chromeBar.post { letakkanPita() }
+    }
+
+    /** Menaruh pita tepat di bawah bilah, atau di tepi atas kalau bilah terlipat. */
+    private fun letakkanPita() {
+        val tujuan = if (bilahTerlipat) 0 else binding.chromeBar.height
+        binding.foldHandle.translationY = tujuan.toFloat()
+    }
+
+    /**
+     * Melipat bilah alamat. Bilah dan pitanya bergerak bersama, jadi pitanya
+     * berhenti tepat di tepi atas layar dan tetap bisa diketuk setelah bilahnya
+     * pergi. Pelepasan bilah dari tata letak dilakukan setelah animasi selesai,
+     * karena mengubah tinggi bilah di tengah animasi memicu perhitungan ulang
+     * kotak virtual di setiap bingkai.
+     */
+    private fun lipatBilah() {
+        if (bilahTerlipat || customView != null) return
         val tinggi = binding.chromeBar.height
         if (tinggi <= 0) return
 
-        tinggiChrome = tinggi
-        chromeTersembunyi = true
+        tinggiBilah = tinggi
+        bilahTerlipat = true
+        perbaruiPita()
+
+        binding.chromeBar.animate().cancel()
         binding.chromeBar.animate()
             .translationY(-tinggi.toFloat())
-            .setDuration(SEMBUNYI_DURASI)
+            .setDuration(LIPAT_DURASI)
             .withEndAction {
                 // Animasi bisa selesai setelah keadaan berubah lagi, dan
                 // melepas bilah yang seharusnya terlihat akan membuatnya hilang.
-                if (chromeTersembunyi) binding.chromeBar.visibility = View.GONE
+                if (bilahTerlipat) binding.chromeBar.visibility = View.GONE
             }
             .start()
+
+        binding.foldHandle.animate().cancel()
+        binding.foldHandle.animate().translationY(0f).setDuration(LIPAT_DURASI).start()
     }
 
-    private fun tampilkanChrome() {
-        if (!chromeTersembunyi) return
-        chromeTersembunyi = false
+    /** Membuka bilah alamat dari keadaan terlipat. */
+    private fun bukaBilah() {
+        if (!bilahTerlipat) return
+        val tinggi = if (tinggiBilah > 0) tinggiBilah else binding.chromeBar.height
+        bilahTerlipat = false
+        perbaruiPita()
+
         binding.chromeBar.animate().cancel()
         binding.chromeBar.visibility = View.VISIBLE
-        val tinggi = if (tinggiChrome > 0) tinggiChrome else binding.chromeBar.height
         binding.chromeBar.translationY = -tinggi.toFloat()
-        binding.chromeBar.animate()
-            .translationY(0f)
-            .setDuration(TAMPIL_DURASI)
-            .start()
+        binding.chromeBar.animate().translationY(0f).setDuration(BUKA_DURASI).start()
+
+        binding.foldHandle.animate().cancel()
+        binding.foldHandle.animate().translationY(tinggi.toFloat()).setDuration(BUKA_DURASI).start()
+    }
+
+    /**
+     * Panah menunjuk ke arah gerak berikutnya: ke atas saat bilah terbuka
+     * karena yang bisa dilakukan berikutnya adalah melipat, dan ke bawah saat
+     * terlipat karena yang bisa dilakukan berikutnya adalah membuka.
+     */
+    private fun perbaruiPita() {
+        binding.foldArrow.rotation = if (bilahTerlipat) 180f else 0f
+        binding.foldHandle.contentDescription = getString(
+            if (bilahTerlipat) R.string.action_unfold_bar else R.string.action_fold_bar,
+        )
     }
 
     /**
      * Bilah status dan bilah navigasi sistem tetap terlihat, karena itu bukan
-     * bagian aplikasi. Yang menyingkir untuk memberi tinggi adalah bilah alamat,
-     * dan itu diurus sembunyikanChrome. Hanya video fullscreen yang menutupi
+     * bagian aplikasi. Yang bisa dilipat untuk memberi tinggi adalah bilah
+     * alamat, dan itu diurus lipatBilah. Hanya video fullscreen yang menutupi
      * keduanya.
      */
     private fun terapkanBilahSistem() {
@@ -848,9 +872,10 @@ class MainActivity : AppCompatActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         terapkanBilahSistem()
-        // Perputaran layar mengubah ukuran kotak, dan bilah yang tersembunyi
-        // akan sulit ditemukan kembali di tata letak yang baru.
-        tampilkanChrome()
+        // Perputaran layar mengubah ukuran kotak, dan bilah yang terlipat akan
+        // sulit ditemukan kembali di tata letak yang baru.
+        bukaBilah()
+        binding.chromeBar.post { letakkanPita() }
         binding.viewportContainer.post { applyVirtualScreen() }
     }
 
