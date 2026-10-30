@@ -260,7 +260,8 @@ Yang dipertahankan dan alasannya:
 - **Ripple tanpa batas.** Panduan mengusulkan ripple oval berbatas. Pemilik memilih tanpa batas.
 
 Satu hal tetap tidak saya sentuh: bilah status sistem tidak pernah disembunyikan, karena pemilik
-sudah menegur kekeliruan itu sekali.
+sudah menegur kekeliruan itu sekali. Aturan ini dibalik pemilik sendiri di versi 1.10.6, terbatas pada
+keadaan bilah alamat terlipat; alasannya ada di bagian 21.
 
 Akibatnya panduan Fase 2 hanya mengubah satu angka di aplikasi ini. Itu bukan kegagalan, tapi hasil
 dari membaca kode yang sudah ada sebelum mengerjakan dokumen baru.
@@ -364,3 +365,33 @@ lipat manual lewat pita tipis di bawah bilah. Yang berubah dan alasannya:
   nol. Ini satu-satunya keadaan yang membuka bilah tanpa pitanya disentuh.
 - **Perputaran layar membuka bilah.** Tata letak berubah total saat diputar, dan pita yang terlipat di
   tata letak baru sulit ditemukan kembali.
+
+## 21. Bilah status ikut hilang saat bilah alamat terlipat
+
+Pemilik meminta keadaan terlipat benar-benar penuh: jam, baterai, dan sinyal tidak tampil. Ini membalik
+aturan 29 Oktober yang menyebut bilah status selalu terlihat, dan pembalikannya terbatas pada satu
+keadaan saja.
+
+Yang diubah dan alasannya:
+
+- **Bilah status disembunyikan hanya saat bilah alamat terlipat.** Di keadaan lain, termasuk saat kolom
+  alamat dipakai, saat sidebar terbuka, dan saat layar diputar, bilah status terlihat kembali. Bilah
+  navigasi sistem tidak pernah disembunyikan, karena tanpa itu tidak ada jalan keluar dari aplikasi.
+- **Jendela diizinkan masuk area kamera.** Sebelumnya mode cutout menahan jendela di bawah lubang kamera,
+  dan dengan mode itu menyembunyikan bilah status hanya menghapus jam tanpa menambah ruang sedikit pun.
+  Mode short edges dipakai supaya ruangnya benar-benar bisa dipakai.
+- **Inset diurus sendiri, bukan lewat fitsSystemWindows.** Saat bilah terlihat, padding atas memakai yang
+  lebih besar antara bilah status dan kamera. Saat terlipat, padding atas nol, dan itulah ruang tambahan
+  yang dipakai halaman. Inset kiri, kanan, dan bawah tetap dihormati, jadi di mendatar tombol tidak
+  masuk ke lubang kamera di sisi layar.
+- **Panah pita bisa digeser dari tengah saat terlipat.** Pita menempati tepi paling atas, tepat di
+  tempat lubang kamera depan pada ponsel berpunch hole. Kalau lubangnya menutupi titik tengah, hanya
+  panahnya yang digeser ke sisi lubang, pitanya tetap selebar layar. Akibatnya posisi mendatar panah
+  berbeda antara terbuka dan terlipat pada perangkat berpunch hole. Itu harga yang dibayar untuk memakai
+  ruang bilah status, dan lebih baik daripada panah yang tidak terlihat.
+- **Membuka sidebar membuka bilah alamat lebih dulu.** Sidebar masuk dari tepi atas, dan tepi itu sedang
+  dipakai halaman saat terlipat. Tanpa membuka bilah, judul sidebar akan berada di bawah lubang kamera.
+
+Yang perlu diuji di perangkat, karena tidak bisa diperiksa dari sini: berapa tambahan tinggi halaman
+yang benar-benar didapat, apakah panah pita masih terlihat, dan apakah geser dari tepi atas untuk
+memunculkan bilah status sementara masih terasa wajar.

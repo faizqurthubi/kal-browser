@@ -35,6 +35,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
@@ -154,14 +155,22 @@ class MainActivity : AppCompatActivity() {
         }
         binding.viewportContainer.post { applyVirtualScreen() }
 
-        // Saat bilah status disembunyikan, isi layar bisa masuk ke area kamera
-        // depan. Mode never menahan jendela di luar area itu, dan karena latar
-        // aplikasi hitam, sisa ruangnya tidak terlihat sebagai kesalahan.
+        // Jendela diizinkan masuk area kamera depan. Tanpa itu, menyembunyikan
+        // bilah status saat terlipat tidak menambah satu piksel pun untuk
+        // halaman, karena jendela tetap ditahan di bawah lubang kamera.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes = window.attributes.apply {
                 layoutInDisplayCutoutMode =
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
             }
+        }
+
+        // Inset diurus sendiri, bukan lewat fitsSystemWindows, karena saat
+        // terlipat padding atas harus nol. Selama bilah alamat terlihat, padding
+        // atas memakai inset yang lebih besar antara bilah status dan kamera.
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, inset ->
+            terapkanInset(inset)
+            inset
         }
         terapkanBilahSistem()
     }
@@ -382,6 +391,10 @@ class MainActivity : AppCompatActivity() {
     private fun bukaSidebar() {
         if (sidebarTerbuka) return
         sidebarTerbuka = true
+        // Sidebar masuk dari tepi atas, dan tepi itu sedang dipakai halaman saat
+        // bilah terlipat. Bilah dibuka lebih dulu supaya judul sidebar tidak
+        // berada di bawah lubang kamera.
+        bukaBilah()
 
         // Keyboard dan fokus kolom alamat dilepas lebih dulu, karena keduanya
         // akan menutupi separuh sidebar dan menahan kursor di tempat lain.
@@ -775,7 +788,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** Menaruh pita tepat di bawah bilah, atau di tepi atas kalau bilah terlipat. */
-    private fun letakkanPita() {
+    private fun letakkanPita(lebar: Int = binding.foldHandle.width, atas: Int = binding.browserContent.paddingTop) {
+        if (lebar <= 0) return
         val tujuan = if (bilahTerlipat) 0 else binding.chromeBar.height
         binding.foldHandle.translationY = tujuan.toFloat()
     }
@@ -795,6 +809,8 @@ class MainActivity : AppCompatActivity() {
         tinggiBilah = tinggi
         bilahTerlipat = true
         perbaruiPita()
+        terapkanBilahSistem()
+        ViewCompat.requestApplyInsets(binding.root)
 
         binding.chromeBar.animate().cancel()
         binding.chromeBar.animate()
@@ -817,6 +833,8 @@ class MainActivity : AppCompatActivity() {
         val tinggi = if (tinggiBilah > 0) tinggiBilah else binding.chromeBar.height
         bilahTerlipat = false
         perbaruiPita()
+        terapkanBilahSistem()
+        ViewCompat.requestApplyInsets(binding.root)
 
         binding.chromeBar.animate().cancel()
         binding.chromeBar.visibility = View.VISIBLE
@@ -850,10 +868,70 @@ class MainActivity : AppCompatActivity() {
         controller.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
-        if (customView != null) {
-            controller.hide(WindowInsetsCompat.Type.systemBars())
+        when {
+            customView != null -> controller.hide(WindowInsetsCompat.Type.systemBars())
+            // Permintaan pemilik: saat bilah alamat terlipat, bilah status ikut
+            // hilang supaya layar benar-benar penuh. Di keadaan lain bilah
+            // status selalu terlihat, termasuk saat kolom alamat dipakai.
+            bilahTerlipat -> {
+                controller.show(WindowInsetsCompat.Type.navigationBars())
+                controller.hide(WindowInsetsCompat.Type.statusBars())
+            }
+            else -> controller.show(WindowInsetsCompat.Type.systemBars())
+        }
+    }
+
+    /**
+     * Menaruh isi aplikasi terhadap bilah sistem dan lubang kamera.
+     *
+     * Saat bilah alamat terlihat, padding atas mengikuti inset yang lebih besar
+     * antara bilah status dan kamera, jadi tidak ada tombol yang tertutup.
+     * Saat terlipat, padding atas nol: itulah ruang yang dipakai halaman.
+     */
+    private fun terapkanInset(inset: WindowInsetsCompat) {
+        val bilah = inset.getInsets(WindowInsetsCompat.Type.systemBars())
+        val kamera = inset.getInsets(WindowInsetsCompat.Type.displayCutout())
+
+        val kiri = maxOf(bilah.left, kamera.left)
+        val kanan = maxOf(bilah.right, kamera.right)
+        val bawah = maxOf(bilah.bottom, kamera.bottom)
+        val atas = if (bilahTerlipat) 0 else maxOf(bilah.top, kamera.top)
+
+        binding.browserContent.setPadding(kiri, atas, kanan, bawah)
+
+        val lebar = binding.foldHandle.width
+        if (lebar > 0) letakkanPita(lebar, atas)
+        aturPanah(inset, lebar)
+    }
+
+    /**
+     * Panah di pita bisa berada tepat di bawah lubang kamera depan saat bilah
+     * terlipat, karena pitanya memang menempati tepi paling atas. Kalau itu
+     * terjadi, hanya panahnya yang digeser ke sisi lubang, pitanya tetap selebar
+     * layar. Posisi mendatar panah tidak lagi di tengah pada perangkat berpunch
+     * hole; ini harga dari memakai ruang bilah status.
+     */
+    private fun aturPanah(inset: WindowInsetsCompat, lebarPita: Int) {
+        if (!bilahTerlipat || lebarPita <= 0) {
+            binding.foldArrow.translationX = 0f
+            return
+        }
+
+        val tengah = lebarPita / 2f
+        val lubang = inset.displayCutout
+            ?.boundingRects
+            ?.firstOrNull { kotak ->
+                kotak.top < binding.foldHandle.height && kotak.bottom > 0 &&
+                    tengah >= kotak.left && tengah <= kotak.right
+            }
+
+        binding.foldArrow.translationX = if (lubang == null) {
+            0f
         } else {
-            controller.show(WindowInsetsCompat.Type.systemBars())
+            val jarak = (6 * resources.displayMetrics.density).toInt()
+            val tujuan = lubang.right + jarak + binding.foldArrow.width / 2f
+            val batas = lebarPita - binding.foldArrow.width / 2f - jarak
+            (tujuan - tengah).coerceAtMost(batas - tengah)
         }
     }
 
