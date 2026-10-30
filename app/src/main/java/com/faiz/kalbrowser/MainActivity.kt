@@ -779,19 +779,6 @@ class MainActivity : AppCompatActivity() {
         binding.foldHandle.setOnClickListener {
             if (bilahTerlipat) bukaBilah() else lipatBilah()
         }
-        // Tinggi bilah berubah saat bilah progres muncul dan hilang, jadi pita
-        // dihitung ulang setiap kali tinggi itu berubah.
-        binding.chromeBar.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
-            if ((bottom - top) != (oldBottom - oldTop) && !bilahTerlipat) letakkanPita()
-        }
-        binding.chromeBar.post { letakkanPita() }
-    }
-
-    /** Menaruh pita tepat di bawah bilah, atau di tepi atas kalau bilah terlipat. */
-    private fun letakkanPita(lebar: Int = binding.foldHandle.width, atas: Int = binding.browserContent.paddingTop) {
-        if (lebar <= 0) return
-        val tujuan = if (bilahTerlipat) 0 else binding.chromeBar.height
-        binding.foldHandle.translationY = tujuan.toFloat()
     }
 
     /**
@@ -817,14 +804,19 @@ class MainActivity : AppCompatActivity() {
             .translationY(-tinggi.toFloat())
             .setDuration(LIPAT_DURASI)
             .withEndAction {
-                // Animasi bisa selesai setelah keadaan berubah lagi, dan
-                // melepas bilah yang seharusnya terlihat akan membuatnya hilang.
-                if (bilahTerlipat) binding.chromeBar.visibility = View.GONE
+                // Bilah dilepas dari tata letak tepat saat animasinya selesai.
+                // Pita yang ada di bawahnya ikut naik sejauh itu, jadi
+                // terjemahannya dinolkan pada bingkai yang sama supaya tidak
+                // terlihat melompat.
+                if (bilahTerlipat) {
+                    binding.chromeBar.visibility = View.GONE
+                    binding.foldHandle.translationY = 0f
+                }
             }
             .start()
 
         binding.foldHandle.animate().cancel()
-        binding.foldHandle.animate().translationY(0f).setDuration(LIPAT_DURASI).start()
+        binding.foldHandle.animate().translationY(-tinggi.toFloat()).setDuration(LIPAT_DURASI).start()
     }
 
     /** Membuka bilah alamat dari keadaan terlipat. */
@@ -836,13 +828,16 @@ class MainActivity : AppCompatActivity() {
         terapkanBilahSistem()
         ViewCompat.requestApplyInsets(binding.root)
 
+        // Bilah dikembalikan ke tata letak lebih dulu, lalu pitanya digeser naik
+        // sejauh tinggi bilah supaya tidak terlihat melompat turun.
         binding.chromeBar.animate().cancel()
         binding.chromeBar.visibility = View.VISIBLE
         binding.chromeBar.translationY = -tinggi.toFloat()
         binding.chromeBar.animate().translationY(0f).setDuration(BUKA_DURASI).start()
 
         binding.foldHandle.animate().cancel()
-        binding.foldHandle.animate().translationY(tinggi.toFloat()).setDuration(BUKA_DURASI).start()
+        binding.foldHandle.translationY = -tinggi.toFloat()
+        binding.foldHandle.animate().translationY(0f).setDuration(BUKA_DURASI).start()
     }
 
     /**
@@ -897,11 +892,22 @@ class MainActivity : AppCompatActivity() {
         val bawah = maxOf(bilah.bottom, kamera.bottom)
         val atas = if (bilahTerlipat) 0 else maxOf(bilah.top, kamera.top)
 
-        binding.browserContent.setPadding(kiri, atas, kanan, bawah)
+        // Bilah alamat dan pitanya diberi jarak dari lubang kamera dan bilah
+        // navigasi, supaya tidak ada tombol yang berada di bawah keduanya.
+        binding.chromeBar.setPadding(kiri, atas, kanan, 0)
+        binding.foldHandle.setPadding(kiri, 0, kanan, 0)
+
+        // Halaman diberi jarak yang sama, tapi latar wadahnya hitam. Dulu
+        // padding ini dipasang di wadah kertas, dan hasilnya pita putih di sisi
+        // layar yang berlubang kamera.
+        binding.viewportWrap.setPadding(kiri, 0, kanan, bawah)
+
+        // Sidebar ikut digeser, karena judulnya bisa berada di bawah lubang
+        // kamera saat layar mendatar.
+        binding.sidebar.setPadding(kiri, atas, kanan, bawah)
 
         val lebar = binding.foldHandle.width
-        if (lebar > 0) letakkanPita(lebar, atas)
-        aturPanah(inset, lebar)
+        if (lebar > 0) aturPanah(inset, lebar - kiri - kanan)
     }
 
     /**
@@ -917,7 +923,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val tengah = lebarPita / 2f
+        // Titik tengah pita diukur dari sisi kiri isinya, dan lubang kamera
+        // dipetakan ke koordinat yang sama.
+        val geser = binding.foldHandle.paddingLeft.toFloat()
+        val tengah = geser + lebarPita / 2f
+        val batasKanan = geser + lebarPita.toFloat()
         val lubang = inset.displayCutout
             ?.boundingRects
             ?.firstOrNull { kotak ->
@@ -930,7 +940,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             val jarak = (6 * resources.displayMetrics.density).toInt()
             val tujuan = lubang.right + jarak + binding.foldArrow.width / 2f
-            val batas = lebarPita - binding.foldArrow.width / 2f - jarak
+            val batas = batasKanan - binding.foldArrow.width / 2f - jarak
             (tujuan - tengah).coerceAtMost(batas - tengah)
         }
     }
@@ -953,7 +963,6 @@ class MainActivity : AppCompatActivity() {
         // Perputaran layar mengubah ukuran kotak, dan bilah yang terlipat akan
         // sulit ditemukan kembali di tata letak yang baru.
         bukaBilah()
-        binding.chromeBar.post { letakkanPita() }
         binding.viewportContainer.post { applyVirtualScreen() }
     }
 

@@ -137,65 +137,75 @@
 
         </LinearLayout>
 
+        <!-- Pita lipat ikut tata letak, bukan menumpang di atas halaman. Dengan
+             begitu isi halaman tidak pernah tertutup pita, di keadaan terbuka
+             maupun terlipat. -->
         <FrameLayout
-            android:id="@+id/viewport_container"
+            android:id="@+id/fold_handle"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/fold_handle_height"
+            android:background="@color/paper"
+            android:clickable="true"
+            android:contentDescription="@string/action_fold_bar"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/fold_arrow"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_fold_arrow"
+                android:tint="@color/ink_muted" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_gravity="bottom"
+                android:background="@color/divider" />
+
+        </FrameLayout>
+
+        <!-- Wadah aman. Paddingnya mengikuti lubang kamera dan bilah navigasi,
+             jadi halaman tidak pernah berada di bawah keduanya. Latarnya hitam
+             supaya sisa ruang itu terbaca sebagai tepi monitor virtual, bukan
+             sebagai pita kosong berwarna kertas. -->
+        <FrameLayout
+            android:id="@+id/viewport_wrap"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:background="@color/letterbox">
 
-            <WebView
-                android:id="@+id/web_view"
+            <FrameLayout
+                android:id="@+id/viewport_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:background="@color/letterbox">
 
-            <TextView
-                android:id="@+id/empty_hint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:paddingStart="32dp"
-                android:paddingEnd="32dp"
-                android:text="@string/empty_hint"
-                android:textColor="@color/letterbox_text"
-                android:textSize="14sp" />
+                <WebView
+                    android:id="@+id/web_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/empty_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:paddingStart="32dp"
+                    android:paddingEnd="32dp"
+                    android:text="@string/empty_hint"
+                    android:textColor="@color/letterbox_text"
+                    android:textSize="14sp" />
+
+            </FrameLayout>
 
         </FrameLayout>
 
     </LinearLayout>
-
-    <!-- Pita lipat. Ia menumpang di atas lapisan halaman, bukan bagian dari
-         tata letak, supaya tinggi halaman tidak pernah berubah karena pita ini.
-         Saat bilah alamat terbuka ia duduk tepat di bawah bilah, dan saat bilah
-         terlipat ia berhenti di tepi atas layar dengan posisi ketuk yang sama. -->
-    <FrameLayout
-        android:id="@+id/fold_handle"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/fold_handle_height"
-        android:layout_gravity="top"
-        android:background="@color/paper"
-        android:clickable="true"
-        android:contentDescription="@string/action_fold_bar"
-        android:focusable="true">
-
-        <ImageView
-            android:id="@+id/fold_arrow"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_gravity="center"
-            android:contentDescription="@null"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_fold_arrow"
-            android:tint="@color/ink_muted" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_gravity="bottom"
-            android:background="@color/divider" />
-
-    </FrameLayout>
 
     <!-- Lapisan gelap saat sidebar terbuka. Mengetuknya menutup sidebar, dan ia
          menahan sentuhan supaya halaman di bawahnya tidak ikut bergerak. -->

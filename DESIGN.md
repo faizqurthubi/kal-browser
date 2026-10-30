@@ -352,11 +352,13 @@ lipat manual lewat pita tipis di bawah bilah. Yang berubah dan alasannya:
   dan juga di bawah 44 dp yang dipakai tombol bilah. Yang meringankannya: pitanya selebar layar, jadi
   hanya arah vertikal yang perlu ketelitian, dan panahnya ada di tengah. Kalau nanti terasa susah
   ditekan, satu angka di `dimens.xml` cukup diubah.
-- **Pita menumpang, bukan menambah tinggi.** Ia berada di lapisan teratas, di atas wadah halaman. Saat
-  bilah terbuka ia duduk tepat di bawah bilah, dan saat bilah terlipat ia naik bersama bilah sampai
-  berhenti di tepi atas layar. Karena tidak pernah masuk tata letak, ia tidak pernah menambah tinggi
-  chrome dan tidak pernah mengubah ukuran virtual halaman. Harganya: 14 dp teratas halaman selalu
-  tertutup pita, dan sentuhan di jalur itu jatuh ke pita, bukan ke situs.
+- **Pita dulu menumpang, sekarang ikut tata letak.** Versi 1.10.5 dan 1.10.6 menaruh pita di lapisan
+  teratas, di atas wadah halaman. Cara itu tidak menambah tinggi chrome, tapi harganya terbukti di
+  perangkat: pita menutupi kepala situs, dan sentuhan di 14 dp teratas jatuh ke pita, bukan ke situs.
+  Pemilik melihatnya sendiri di situs TBK, judul halaman tertutup pita. Sejak 1.10.7 pita adalah baris
+  tata letak, jadi halaman selalu mulai di bawahnya dan tidak ada isi situs yang tertutup. Konsekuensinya
+  chrome menjadi 62 dp saat terbuka dan 14 dp saat terlipat, dan pita tidak lagi memberi tambahan ruang
+  apa pun untuk halaman.
 - **Pita ikut bergerak bersama bilah, bukan menetap di tepi atas.** Pemilik memilih ini. Keuntungannya
   saat bilah terbuka tidak ada ruang yang terbuang; kekurangannya titik ketuknya berpindah 48 dp antara
   keadaan terbuka dan terlipat. Karena itu panahnya selalu menunjuk ke arah gerak berikutnya, dan
@@ -395,3 +397,24 @@ Yang diubah dan alasannya:
 Yang perlu diuji di perangkat, karena tidak bisa diperiksa dari sini: berapa tambahan tinggi halaman
 yang benar-benar didapat, apakah panah pita masih terlihat, dan apakah geser dari tepi atas untuk
 memunculkan bilah status sementara masih terasa wajar.
+
+## 22. Pita masuk tata letak dan inset pindah ke wadah hitam
+
+Dua keluhan pemilik setelah memasang 1.10.6, keduanya terlihat di satu tangkapan layar situs TBK:
+judul halaman tertutup pita lipat, dan sisi kiri layar berwarna putih di area lubang kamera.
+
+- **Pita jadi baris tata letak.** Selama pita menumpang, ia selalu menutupi 14 dp teratas halaman, dan
+  di situs yang kepala halamannya langsung berisi judul, yang tertutup justru judulnya. Pita sekarang
+  berada di antara bilah dan wadah halaman, jadi halaman mulai di bawahnya. Saat bilah terlipat, bilah
+  dan pitanya naik bersama dan halaman memakai 48 dp dari bilah itu, bukan 62 dp. Tambahan ruang dari
+  menghilangnya bilah status tetap ada.
+- **Inset tidak lagi dipasang di wadah kertas.** Versi 1.10.6 memberi padding atas ke `browser_content`
+  yang berlatar kertas, jadi di mendatar area lubang kamera tampil sebagai pita putih di sisi layar.
+  Sekarang padding atas hanya dipakai bilah dan pita, dan padding kiri, kanan, serta bawah dipasang di
+  wadah halaman yang berlatar hitam. Sisa ruang itu terbaca sebagai tepi monitor virtual, sama seperti
+  letterbox halaman.
+- **Sidebar ikut menghormati inset.** Judul sidebar juga bisa berada di bawah lubang kamera saat layar
+  mendatar, jadi paddingnya memakai inset yang sama.
+
+Yang perlu diuji di perangkat: apakah judul situs sekarang utuh, apakah sisi layar sudah hitam, dan
+berapa tambahan tinggi halaman yang benar-benar didapat dari hilangnya bilah status.

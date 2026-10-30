@@ -142,10 +142,15 @@ bilah, 48 dp. Ikon itu menempati tempat menu titik tiga yang digantikannya.
   lagi sembunyi otomatis saat halaman digulir. Pita itu menumpang di lapisan atas, jadi ia tidak
   menambah tinggi chrome; saat bilah terlipat ia berhenti di tepi atas layar dan tetap bisa diketuk di
   titik yang sama. Mengetuk kolom alamat saat bilah terlipat otomatis membukanya.
+- **Pita lipat ikut tata letak.** Halaman selalu mulai di bawah pita, jadi isi situs tidak pernah
+  tertutup. Karena itu pitanya tidak menambah ruang untuk halaman; yang menambah ruang hanya bilah
+  alamat yang terlipat dan bilah status yang ikut hilang.
 - **Bilah status sistem** ikut hilang saat bilah alamat terlipat, jadi jam dan baterai tidak tampil dan
   halaman memakai ruang itu. Saat bilah alamat terbuka, bilah status kembali terlihat. Menggeser dari
   tepi atas memunculkannya sebentar. **Bilah navigasi sistem** tetap terlihat selalu, karena tanpa itu
   tidak ada cara meninggalkan aplikasi. Video fullscreen menutupi keduanya.
+- **Sisa ruang di sisi lubang kamera dan bilah navigasi berwarna hitam**, sama seperti tepi monitor
+  virtual. Halaman diberi jarak dari keduanya, jadi tidak ada isi situs yang berada di bawah kamera.
 - **Bilah progres** berupa garis 2 dp di bawah bilah atas, dan hanya muncul saat halaman dimuat.
 
 ## Memasang pembaruan tanpa menghapus aplikasi
